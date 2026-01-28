@@ -1,0 +1,63 @@
+{
+	"version": 1,
+	"named_parameters": true,
+	"general": {
+		"title": "MOSuite-clean",
+		"instructions": "clean raw counts in a multiOmicsDataSet"
+	},
+	"datasets": [
+		{
+			"id": "bd9a7518-66cb-4d50-9992-df3271aeb807",
+			"name": "NIDAP bulk RNA-seq training dataset"
+		}
+	],
+	"categories": [
+		{
+			"id": "gDLmTU36PrmD13RK",
+			"name": "Input Data Parameters",
+			"description": "Options for defining input data",
+			"icon": "📁"
+		},
+		{
+			"id": "gn9FXwemlVazWQIo",
+			"name": "Basic",
+			"icon": "📂"
+		},
+		{
+			"id": "XqgPq28Eo5VCFSZu",
+			"name": "Advanced",
+			"description": "Advanced parameters",
+			"icon": "📂"
+		}
+	],
+	"parameters": [
+		{
+			"id": "vErI4n2A3SVqtFPz",
+			"category": "gDLmTU36PrmD13RK",
+			"name": "multiOmicDataSet file pattern",
+			"param_name": "regex_moo",
+			"description": "Regular expression pattern to match a multiOmicDataset RDS file in data/",
+			"type": "text",
+			"value_type": "string",
+			"default_value": ".*\\.rds$"
+		},
+		{
+			"id": "UA4GuIpVAxdcmHAG",
+			"category": "XqgPq28Eo5VCFSZu",
+			"name": "count type",
+			"param_name": "count_type",
+			"description": "which counts to filter. Must be a count type in names(moo@counts)",
+			"type": "text",
+			"value_type": "string",
+			"default_value": "clean"
+		}
+	],
+	"results": [
+		{
+			"file_name": "moo/moo.rds"
+		},
+		{
+			"file_name": "figures/filter/"
+		}
+	]
+}
