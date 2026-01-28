@@ -7,8 +7,8 @@
 	},
 	"datasets": [
 		{
-			"id": "bd9a7518-66cb-4d50-9992-df3271aeb807",
-			"name": "NIDAP bulk RNA-seq training dataset"
+			"id": "12295d69-85c7-4cbf-825f-7b5cf0fd4a39",
+			"name": "multiOmicDataSet - clean counts"
 		}
 	],
 	"categories": [
