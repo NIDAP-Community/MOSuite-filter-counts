@@ -2,13 +2,13 @@
 	"version": 1,
 	"named_parameters": true,
 	"general": {
-		"title": "MOSuite-clean",
-		"instructions": "clean raw counts in a multiOmicsDataSet"
+		"title": "MOSuite-filter",
+		"instructions": "filter low counts in a multiOmicsDataSet"
 	},
 	"datasets": [
 		{
-			"id": "bd9a7518-66cb-4d50-9992-df3271aeb807",
-			"name": "NIDAP bulk RNA-seq training dataset"
+			"id": "814a1cc1-fc40-40d7-a035-b819c160b8b1",
+			"name": "multiOmicDataSet"
 		}
 	],
 	"categories": [
@@ -22,6 +22,12 @@
 			"id": "gn9FXwemlVazWQIo",
 			"name": "Basic",
 			"icon": "📂"
+		},
+		{
+			"id": "rT9kLmPqRsUvWxYz",
+			"name": "Visualization",
+			"description": "Visualization and plotting options",
+			"icon": "📊"
 		},
 		{
 			"id": "XqgPq28Eo5VCFSZu",
@@ -42,20 +48,134 @@
 			"default_value": ".*\\.rds$"
 		},
 		{
-			"id": "UA4GuIpVAxdcmHAG",
+			"id": "vJvArGM6rjelGp9v",
+			"category": "gn9FXwemlVazWQIo",
+			"name": "Group column name",
+			"param_name": "group_colname",
+			"description": "Column from sample metadata containing sample group information (e.g. treatment, phenotype)",
+			"type": "text",
+			"value_type": "string",
+			"default_value": "Group"
+		},
+		{
+			"id": "vJvArGM6rjelGp9z",
+			"category": "gn9FXwemlVazWQIo",
+			"name": "Minimum count value",
+			"param_name": "minimum_count_value_to_be_considered_nonzero",
+			"description": "Minimum count value to be considered non-zero for a sample",
+			"type": "text",
+			"value_type": "integer",
+			"default_value": "8"
+		},
+		{
+			"id": "vJvArGM6rjelGp9a",
+			"category": "gn9FXwemlVazWQIo",
+			"name": "Minimum samples with nonzero counts (total)",
+			"param_name": "minimum_number_of_samples_with_nonzero_counts_in_total",
+			"description": "Minimum number of samples (total) with non-zero counts",
+			"type": "text",
+			"value_type": "integer",
+			"default_value": "7"
+		},
+		{
+			"id": "vJvArGM6rjelGp9b",
+			"category": "gn9FXwemlVazWQIo",
+			"name": "Use CPM for filtering",
+			"param_name": "use_cpm_counts_to_filter",
+			"description": "Transform raw counts to CPM before filtering",
+			"help_text": "Set TRUE for raw counts, FALSE if counts are already normalized/transformed",
+			"type": "text",
+			"value_type": "string",
+			"default_value": "TRUE",
+			"pattern": "TRUE|FALSE|T|F"
+		},
+		{
+			"id": "vJvArGM6rjelGp9c",
+			"category": "rT9kLmPqRsUvWxYz",
+			"name": "Label column name",
+			"param_name": "label_colname",
+			"description": "Column from sample metadata with labels for plots (e.g. shortened sample names)",
+			"help_text": "Leave blank to use the sample ID column",
+			"type": "text",
+			"value_type": "string"
+		},
+		{
+			"id": "vJvArGM6rjelGp9d",
 			"category": "XqgPq28Eo5VCFSZu",
-			"name": "count type",
+			"name": "Minimum samples per group with nonzero counts",
+			"param_name": "minimum_number_of_samples_with_nonzero_counts_in_a_group",
+			"description": "Only keeps genes that have at least this number of samples with nonzero counts in at least one group",
+			"type": "text",
+			"value_type": "integer",
+			"default_value": "3"
+		},
+		{
+			"id": "vJvArGM6rjelGp9e",
+			"category": "XqgPq28Eo5VCFSZu",
+			"name": "Use group-based filtering",
+			"param_name": "use_group_based_filtering",
+			"description": "If TRUE, only keeps features that have sufficient nonzero counts in at least one group",
+			"type": "text",
+			"value_type": "string",
+			"default_value": "FALSE",
+			"pattern": "TRUE|FALSE|T|F"
+		},
+		{
+			"id": "vJvArGM6rjelGp9f",
+			"category": "rT9kLmPqRsUvWxYz",
+			"name": "Plot correlation heatmap",
+			"param_name": "plot_corr_matrix_heatmap",
+			"description": "Create a correlation matrix heatmap for sample similarity",
+			"help_text": "Set to FALSE for datasets with many samples to avoid long run times",
+			"type": "text",
+			"value_type": "string",
+			"default_value": "TRUE",
+			"pattern": "TRUE|FALSE|T|F"
+		},
+		{
+			"id": "vJvArGM6rjelGp9g",
+			"category": "rT9kLmPqRsUvWxYz",
+			"name": "Interactive plots",
+			"param_name": "interactive_plots",
+			"description": "Create interactive plots with plotly (PCA and histogram)",
+			"help_text": "Interactive plots allow hovering to view sample information, but correlation heatmap will not display",
+			"type": "text",
+			"value_type": "string",
+			"default_value": "FALSE",
+			"pattern": "TRUE|FALSE|T|F"
+		},
+		{
+			"id": "vJvArGM6rjelGp9u",
+			"category": "XqgPq28Eo5VCFSZu",
+			"name": "Count type",
 			"param_name": "count_type",
-			"description": "which counts to filter. Must be a count type in names(moo@counts)",
+			"description": "Type of counts to filter. Must be a count type in names(moo@counts)",
 			"type": "text",
 			"value_type": "string",
 			"default_value": "clean"
+		},
+		{
+			"id": "vJvArGM6rjelGp9w",
+			"category": "XqgPq28Eo5VCFSZu",
+			"name": "Feature ID column name",
+			"param_name": "feature_id_colname",
+			"description": "Column name in the counts matrix containing feature IDs",
+			"help_text": "Leave blank to use the first column by default",
+			"type": "text",
+			"value_type": "string"
+		},
+		{
+			"id": "9I181eKDMmKH4kuZ",
+			"category": "XqgPq28Eo5VCFSZu",
+			"name": "Sample ID column name",
+			"param_name": "sample_id_colname",
+			"description": "Column name in the sample metadata containing sample IDs",
+			"help_text": "Leave blank to use the first column in the sample metadata by default",
+			"type": "text",
+			"value_type": "string"
 		}
 	],
 	"results": [
-		{
-			"file_name": "moo/moo.rds"
-		},
 		{
 			"file_name": "figures/filter/"
 		}
