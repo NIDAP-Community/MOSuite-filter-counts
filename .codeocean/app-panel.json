@@ -7,7 +7,7 @@
 	},
 	"datasets": [
 		{
-			"id": "814a1cc1-fc40-40d7-a035-b819c160b8b1",
+			"id": "12295d69-85c7-4cbf-825f-7b5cf0fd4a39",
 			"name": "multiOmicDataSet"
 		}
 	],
@@ -100,27 +100,6 @@
 			"value_type": "string"
 		},
 		{
-			"id": "vJvArGM6rjelGp9d",
-			"category": "XqgPq28Eo5VCFSZu",
-			"name": "Minimum samples per group with nonzero counts",
-			"param_name": "minimum_number_of_samples_with_nonzero_counts_in_a_group",
-			"description": "Only keeps genes that have at least this number of samples with nonzero counts in at least one group",
-			"type": "text",
-			"value_type": "integer",
-			"default_value": "3"
-		},
-		{
-			"id": "vJvArGM6rjelGp9e",
-			"category": "XqgPq28Eo5VCFSZu",
-			"name": "Use group-based filtering",
-			"param_name": "use_group_based_filtering",
-			"description": "If TRUE, only keeps features that have sufficient nonzero counts in at least one group",
-			"type": "text",
-			"value_type": "string",
-			"default_value": "FALSE",
-			"pattern": "TRUE|FALSE|T|F"
-		},
-		{
 			"id": "vJvArGM6rjelGp9f",
 			"category": "rT9kLmPqRsUvWxYz",
 			"name": "Plot correlation heatmap",
@@ -139,6 +118,27 @@
 			"param_name": "interactive_plots",
 			"description": "Create interactive plots with plotly (PCA and histogram)",
 			"help_text": "Interactive plots allow hovering to view sample information, but correlation heatmap will not display",
+			"type": "text",
+			"value_type": "string",
+			"default_value": "FALSE",
+			"pattern": "TRUE|FALSE|T|F"
+		},
+		{
+			"id": "vJvArGM6rjelGp9d",
+			"category": "XqgPq28Eo5VCFSZu",
+			"name": "Minimum samples per group with nonzero counts",
+			"param_name": "minimum_number_of_samples_with_nonzero_counts_in_a_group",
+			"description": "Only keeps genes that have at least this number of samples with nonzero counts in at least one group",
+			"type": "text",
+			"value_type": "integer",
+			"default_value": "3"
+		},
+		{
+			"id": "vJvArGM6rjelGp9e",
+			"category": "XqgPq28Eo5VCFSZu",
+			"name": "Use group-based filtering",
+			"param_name": "use_group_based_filtering",
+			"description": "If TRUE, only keeps features that have sufficient nonzero counts in at least one group",
 			"type": "text",
 			"value_type": "string",
 			"default_value": "FALSE",
@@ -177,7 +177,13 @@
 	],
 	"results": [
 		{
-			"file_name": "figures/filter/"
+			"file_name": "figures/filt/corr_heatmap.png"
+		},
+		{
+			"file_name": "figures/filt/histogram.png"
+		},
+		{
+			"file_name": "figures/filt/pca.png"
 		}
 	]
 }
