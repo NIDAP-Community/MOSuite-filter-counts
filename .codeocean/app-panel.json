@@ -38,16 +38,6 @@
 	],
 	"parameters": [
 		{
-			"id": "vErI4n2A3SVqtFPz",
-			"category": "gDLmTU36PrmD13RK",
-			"name": "multiOmicDataSet file pattern",
-			"param_name": "regex_moo",
-			"description": "Regular expression pattern to match a multiOmicDataset RDS file in data/",
-			"type": "text",
-			"value_type": "string",
-			"default_value": ".*\\.rds$"
-		},
-		{
 			"id": "vJvArGM6rjelGp9v",
 			"category": "gn9FXwemlVazWQIo",
 			"name": "Group column name",
