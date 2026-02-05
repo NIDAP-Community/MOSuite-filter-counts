@@ -1,6 +1,6 @@
 # Code Ocean capsule - MOSuite - filter low counts
 
-## development version
+## v2.0
 
 - Use new docker image: `MOSuite R (0.2.1-dev)`
 
