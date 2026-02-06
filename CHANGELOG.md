@@ -1,7 +1,8 @@
 # Code Ocean capsule - MOSuite - filter low counts
 
-## development version
+## v3.0
 
+- Use MOSuite v0.3.0.
 - Fix: remove `regex_moo` parameter from configuration. multiOmicDataSet input files are now required to follow the standardized naming pattern (`.*\.rds$`).
 
 ## v2.0
