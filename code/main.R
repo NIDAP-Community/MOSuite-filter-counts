@@ -1,5 +1,4 @@
 #!/usr/bin/env Rscript
-rlang::global_entrace()
 library(argparse)
 library(glue)
 library(MOSuite)
@@ -47,4 +46,4 @@ moo |>
         plot_corr_matrix_heatmap = args$plot_corr_matrix_heatmap,
         interactive_plots = args$interactive_plots
         ) |> 
-    write_rds(file.path(getOption("moo_plots_dir"), "..", "moo", "moo.rds"))
+    write_rds(file.path(getOption("moo_plots_dir"), "..", "moo", "moo-filt.rds"))
