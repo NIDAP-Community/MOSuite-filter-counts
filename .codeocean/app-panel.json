@@ -16,27 +16,41 @@
 			"id": "gDLmTU36PrmD13RK",
 			"name": "Input Data Parameters",
 			"description": "Options for defining input data",
-			"icon": "📁"
+			"icon": "\ud83d\udcc1"
 		},
 		{
 			"id": "gn9FXwemlVazWQIo",
 			"name": "Basic",
-			"icon": "📂"
+			"icon": "\ud83d\udcc2"
 		},
 		{
 			"id": "rT9kLmPqRsUvWxYz",
 			"name": "Visualization",
 			"description": "Visualization and plotting options",
-			"icon": "📊"
+			"icon": "\ud83d\udcca"
 		},
 		{
 			"id": "XqgPq28Eo5VCFSZu",
 			"name": "Advanced",
 			"description": "Advanced parameters",
-			"icon": "📂"
+			"icon": "\ud83d\udcc2"
 		}
 	],
 	"parameters": [
+		{
+			"id": "vJvArGM6rjelGp9u",
+			"category": "gn9FXwemlVazWQIo",
+			"name": "Count type",
+			"param_name": "count_type",
+			"description": "Type of counts to filter. Must be a count type in names(moo@counts)",
+			"type": "list",
+			"value_type": "string",
+			"default_value": "clean",
+			"extra_data": [
+				"raw",
+				"clean"
+			]
+		},
 		{
 			"id": "vJvArGM6rjelGp9v",
 			"category": "gn9FXwemlVazWQIo",
@@ -144,20 +158,6 @@
 			"extra_data": [
 				"TRUE",
 				"FALSE"
-			]
-		},
-		{
-			"id": "vJvArGM6rjelGp9u",
-			"category": "XqgPq28Eo5VCFSZu",
-			"name": "Count type",
-			"param_name": "count_type",
-			"description": "Type of counts to filter. Must be a count type in names(moo@counts)",
-			"type": "list",
-			"value_type": "string",
-			"default_value": "clean",
-			"extra_data": [
-				"raw",
-				"clean"
 			]
 		},
 		{
