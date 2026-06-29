@@ -152,9 +152,13 @@
 			"name": "Count type",
 			"param_name": "count_type",
 			"description": "Type of counts to filter. Must be a count type in names(moo@counts)",
-			"type": "text",
+			"type": "list",
 			"value_type": "string",
-			"default_value": "clean"
+			"default_value": "clean",
+			"extra_data": [
+				"raw",
+				"clean"
+			]
 		},
 		{
 			"id": "vJvArGM6rjelGp9w",
