@@ -1,5 +1,9 @@
 # Code Ocean capsule - MOSuite - filter low counts
 
+## Development version
+
+- Improved the Code Ocean parameter UI by using list controls for key options and reorganizing related filtering and visualization settings (#2).
+
 ## v3.0
 
 - Use MOSuite v0.3.0.
