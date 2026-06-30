@@ -2,7 +2,7 @@
 
 ## Development version
 
-- Improved the Code Ocean parameter UI by using list controls for key options and reorganizing related filtering and visualization settings (#2).
+- Improved the Code Ocean parameter UI by using list controls for key options and reorganizing related filtering and visualization settings. (#2, @phoman14)
 
 ## v3.0
 
