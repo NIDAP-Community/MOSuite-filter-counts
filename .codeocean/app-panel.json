@@ -137,16 +137,6 @@
 			]
 		},
 		{
-			"id": "vJvArGM6rjelGp9d",
-			"category": "XqgPq28Eo5VCFSZu",
-			"name": "Minimum samples per group with nonzero counts",
-			"param_name": "minimum_number_of_samples_with_nonzero_counts_in_a_group",
-			"description": "Only keeps genes that have at least this number of samples with nonzero counts in at least one group",
-			"type": "text",
-			"value_type": "integer",
-			"default_value": "3"
-		},
-		{
 			"id": "vJvArGM6rjelGp9e",
 			"category": "XqgPq28Eo5VCFSZu",
 			"name": "Use group-based filtering",
@@ -159,6 +149,16 @@
 				"TRUE",
 				"FALSE"
 			]
+		},
+		{
+			"id": "vJvArGM6rjelGp9d",
+			"category": "XqgPq28Eo5VCFSZu",
+			"name": "Minimum samples per group with nonzero counts",
+			"param_name": "minimum_number_of_samples_with_nonzero_counts_in_a_group",
+			"description": "Only keeps genes that have at least this number of samples with nonzero counts in at least one group",
+			"type": "text",
+			"value_type": "integer",
+			"default_value": "3"
 		},
 		{
 			"id": "vJvArGM6rjelGp9w",
