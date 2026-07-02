@@ -9,6 +9,18 @@ library(dplyr)
 # set up capsule environment
 setup_capsule_environment()
 
+parse_optional_number <- function(x) {
+  if (is.null(x) || length(x) == 0 || is.na(x) || trimws(x) == "") {
+    return(NULL)
+  }
+
+  value <- suppressWarnings(as.numeric(x))
+  if (is.na(value)) {
+    stop(glue::glue("Expected a number, got '{x}'"))
+  }
+  value
+}
+
 # parse CLI arguments
 parser <- ArgumentParser()
 
@@ -147,9 +159,9 @@ parser$add_argument(
 )
 parser$add_argument(
   "--legend_font_size_for_histogram",
-  type = "double",
-  default = 10,
-  help = "Legend font size for histogram"
+  type = "character",
+  default = "",
+  help = "Legend font size for histogram. Leave blank to scale automatically."
 )
 parser$add_argument(
   "--legend_position_for_histogram",
@@ -213,7 +225,7 @@ moo |>
     set_min_max_for_x_axis_for_histogram = args$set_min_max_for_x_axis_for_histogram,
     minimum_for_x_axis_for_histogram = args$minimum_for_x_axis_for_histogram,
     maximum_for_x_axis_for_histogram = args$maximum_for_x_axis_for_histogram,
-    legend_font_size_for_histogram = args$legend_font_size_for_histogram,
+    legend_font_size_for_histogram = parse_optional_number(args$legend_font_size_for_histogram),
     legend_position_for_histogram = args$legend_position_for_histogram,
     number_of_histogram_legend_columns = args$number_of_histogram_legend_columns,
     plot_corr_matrix_heatmap = args$plot_corr_matrix_heatmap,

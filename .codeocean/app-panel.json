@@ -277,10 +277,10 @@
 			"category": "VisHistogram",
 			"name": "Legend font size for histogram",
 			"param_name": "legend_font_size_for_histogram",
-			"description": "Legend font size for histogram plot",
+			"description": "Legend font size for histogram plot. Leave blank to scale automatically.",
 			"type": "text",
 			"value_type": "number",
-			"default_value": "10"
+			"default_value": ""
 		},
 		{
 			"id": "fX6mJjNtHp1kWq4z",
