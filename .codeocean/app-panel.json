@@ -324,6 +324,17 @@
 			]
 		},
 		{
+			"id": "filter_colors_for_plots_id",
+			"category": "rT9kLmPqRsUvWxYz",
+			"name": "Colors for plots",
+			"param_name": "colors_for_plots",
+			"description": "Comma-separated colors for PCA and histogram. Defaults to the MOSuite palette.",
+			"help_text": "Use color names or hex codes. Supplied colors are used first; if there are more groups than colors, additional colors are generated from the MOSuite palette, with random colors only if that palette is too short.",
+			"type": "text",
+			"value_type": "string",
+			"default_value": "#5954d6,#e1562c,#b80058,#00c6f8,#d163e6,#00a76c,#ff9287,#008cf9,#006e00,#796880,#FFA500,#878500"
+		},
+		{
 			"id": "vJvArGM6rjelGp9g",
 			"category": "VisGeneral",
 			"name": "Interactive plots",
