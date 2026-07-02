@@ -130,7 +130,7 @@
 			"name": "Colors for plots",
 			"param_name": "colors_for_plots",
 			"description": "Comma-separated list of colors for PCA and histogram",
-			"help_text": "Use color names or hex codes. Leave blank to use defaults",
+			"help_text": "Use color names or hex codes. Leave blank to use defaults.",
 			"type": "text",
 			"value_type": "string"
 		},
@@ -222,7 +222,7 @@
 			"description": "Point size for the PCA plot",
 			"type": "text",
 			"value_type": "number",
-			"default_value": "1"
+			"default_value": "3"
 		},
 		{
 			"id": "fS1hEeIoCk6fRl9u",
