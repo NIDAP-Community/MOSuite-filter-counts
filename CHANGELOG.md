@@ -2,8 +2,8 @@
 
 ## Development version
 
-- Align plot color defaults with MOSuite package defaults.
-- Leave the histogram legend font size blank by default so MOSuite can scale long or numerous legend labels automatically.
+- Align plot color defaults with MOSuite package defaults (#3, @phoman14).
+- Leave the histogram legend font size blank by default so MOSuite can scale long or numerous legend labels automatically (#3, @phoman14).
 
 ## v3.0
 
