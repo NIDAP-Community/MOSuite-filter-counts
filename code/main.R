@@ -225,7 +225,9 @@ moo |>
     set_min_max_for_x_axis_for_histogram = args$set_min_max_for_x_axis_for_histogram,
     minimum_for_x_axis_for_histogram = args$minimum_for_x_axis_for_histogram,
     maximum_for_x_axis_for_histogram = args$maximum_for_x_axis_for_histogram,
-    legend_font_size_for_histogram = parse_optional_number(args$legend_font_size_for_histogram),
+    legend_font_size_for_histogram = parse_optional_number(
+      args$legend_font_size_for_histogram
+    ),
     legend_position_for_histogram = args$legend_position_for_histogram,
     number_of_histogram_legend_columns = args$number_of_histogram_legend_columns,
     plot_corr_matrix_heatmap = args$plot_corr_matrix_heatmap,
