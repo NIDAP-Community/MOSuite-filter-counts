@@ -16,42 +16,42 @@
 			"id": "gDLmTU36PrmD13RK",
 			"name": "Input Data Parameters",
 			"description": "Options for defining input data",
-			"icon": "\ud83d\udcc1"
+			"icon": "📁"
 		},
 		{
 			"id": "gn9FXwemlVazWQIo",
 			"name": "Basic",
-			"icon": "\ud83d\udcc2"
+			"icon": "📂"
 		},
 		{
 			"id": "VisGeneral",
 			"name": "Visualization: General",
 			"description": "General visualization and plotting options",
-			"icon": "\ud83d\udcca"
+			"icon": "📊"
 		},
 		{
 			"id": "VisPCA",
 			"name": "Visualization: PCA",
 			"description": "PCA plot options",
-			"icon": "\ud83d\udcca"
+			"icon": "📊"
 		},
 		{
 			"id": "VisHistogram",
 			"name": "Visualization: Histogram",
 			"description": "Histogram plot options",
-			"icon": "\ud83d\udcca"
+			"icon": "📊"
 		},
 		{
 			"id": "VisHeatmap",
 			"name": "Visualization: Heatmap",
 			"description": "Heatmap plot options",
-			"icon": "\ud83d\udcca"
+			"icon": "📊"
 		},
 		{
 			"id": "XqgPq28Eo5VCFSZu",
 			"name": "Advanced",
 			"description": "Advanced parameters",
-			"icon": "\ud83d\udcc2"
+			"icon": "📂"
 		}
 	],
 	"parameters": [
@@ -279,8 +279,7 @@
 			"param_name": "legend_font_size_for_histogram",
 			"description": "Legend font size for histogram plot. Leave blank to scale automatically.",
 			"type": "text",
-			"value_type": "number",
-			"default_value": ""
+			"value_type": "number"
 		},
 		{
 			"id": "fX6mJjNtHp1kWq4z",
@@ -322,17 +321,6 @@
 				"TRUE",
 				"FALSE"
 			]
-		},
-		{
-			"id": "filter_colors_for_plots_id",
-			"category": "rT9kLmPqRsUvWxYz",
-			"name": "Colors for plots",
-			"param_name": "colors_for_plots",
-			"description": "Comma-separated colors for PCA and histogram. Defaults to the MOSuite palette.",
-			"help_text": "Use color names or hex codes. Supplied colors are used first; if there are more groups than colors, additional colors are generated from the MOSuite palette, with random colors only if that palette is too short.",
-			"type": "text",
-			"value_type": "string",
-			"default_value": "#5954d6,#e1562c,#b80058,#00c6f8,#d163e6,#00a76c,#ff9287,#008cf9,#006e00,#796880,#FFA500,#878500"
 		},
 		{
 			"id": "vJvArGM6rjelGp9g",
