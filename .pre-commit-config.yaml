@@ -7,10 +7,8 @@ exclude: |
       ^metadata/|
       ^code/MOSuite|
       ^code/SCWorkflow|
-      ^code/OMIX.*|
+      ^code/OMIX*
    )
-ci:
-  skip: [detect-absolute-paths]
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -44,7 +42,8 @@ repos:
       - id: ruff-check
         args: [--fix]
       - id: ruff-format
-  # enforce commit format
+
+  # enforce conventional commit format
   - repo: https://github.com/compilerla/conventional-pre-commit
     rev: v4.4.0
     hooks:
