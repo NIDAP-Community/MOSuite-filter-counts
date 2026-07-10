@@ -38,9 +38,9 @@ setup_cli_workspace <- function(prefix = "mosuite_filter_counts_test_") {
   main_copy <- file.path(code_dir, "main.R")
   main_lines <- readLines(main_copy)
   main_lines <- gsub(
-    "devtools::load_all('/code/MOSuite')",
+    'devtools::load_all("/code/MOSuite")',
     sprintf(
-      "devtools::load_all('%s')",
+      'devtools::load_all("%s")',
       file.path(repo_root, "code", "MOSuite")
     ),
     main_lines,
