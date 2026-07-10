@@ -3,44 +3,45 @@ name: auto-format
 on:
   workflow_dispatch:
   pull_request:
-
-env:
-  GH_TOKEN: ${{ github.token }}
-
-permissions:
-  contents: write
-  pull-requests: write
+    branches: [dev, main]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
   auto-format:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-        if: github.event_name == 'pull_request'
+      - name: Generate a token
+        id: generate-token
+        uses: actions/create-github-app-token@v2
         with:
-          fetch-depth: 0
-          ref: ${{ github.head_ref }}
-      - uses: actions/checkout@v4
-        if: github.event_name != 'pull_request'
+          app-id: ${{ vars.CCBR_BOT_APP_ID }}
+          private-key: ${{ secrets.CCBR_BOT_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - uses: actions/checkout@v7
         with:
-          fetch-depth: 0
-          ref: ${{ github.ref_name }}
+          token: ${{ steps.generate-token.outputs.token }}
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
 
       - name: git config
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "CCBR-bot"
+          git config --global user.email "258092125+ccbr-bot@users.noreply.github.com"
 
-      - name: Format R code with air
-        uses: rstudio/shiny-workflows/format-r-code@v1
-
+      - name: format
+        uses: pre-commit/action@v3.0.1
+        continue-on-error: true
       - name: commit & push
+        if: ${{ github.event_name == 'pull_request' }}
         run: |
           git add .
-          git commit -m "ci: 🤖 auto-format" || echo "nothing to commit"
+          git commit -m "ci: 🤖 auto-format with pre-commit" || echo "nothing to commit"
           git push || echo "nothing to push"
