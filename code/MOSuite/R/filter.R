@@ -238,6 +238,25 @@ filter_counts <- function(
       number_of_legend_columns = number_of_histogram_legend_columns
     ) +
       ggplot2::labs(caption = "filtered counts")
+    if (isTRUE(plot_corr_matrix_heatmap)) {
+      corHM <- plot_corr_heatmap(
+        df_filt[, samples_to_include],
+        sample_metadata = sample_metadata,
+        sample_id_colname = sample_id_colname,
+        feature_id_colname = feature_id_colname,
+        label_colname = label_colname,
+        group_colname = group_colname,
+        color_values = colors_for_plots
+      )
+      print_or_save_plot(
+        corHM,
+        filename = file.path(plots_subdir, "corr_heatmap.png"),
+        print_plots = print_plots,
+        save_plots = save_plots,
+        caption = "filtered counts"
+      )
+    }
+
     plot_ext <- "png"
     if (isTRUE(interactive_plots)) {
       pca_plot <- pca_plot |> plotly::ggplotly(tooltip = c("sample", "group"))
@@ -257,24 +276,6 @@ filter_counts <- function(
       print_plots = print_plots,
       save_plots = save_plots
     )
-    if (isTRUE(plot_corr_matrix_heatmap)) {
-      corHM <- plot_corr_heatmap(
-        df_filt[, samples_to_include],
-        sample_metadata = sample_metadata,
-        sample_id_colname = sample_id_colname,
-        feature_id_colname = feature_id_colname,
-        label_colname = label_colname,
-        group_colname = group_colname,
-        color_values = colors_for_plots
-      )
-      print_or_save_plot(
-        corHM,
-        filename = file.path(plots_subdir, "corr_heatmap.png"),
-        print_plots = print_plots,
-        save_plots = save_plots,
-        caption = "filtered counts"
-      )
-    }
   }
   df_final <- df |>
     dplyr::filter(
