@@ -127,13 +127,43 @@
 		{
 			"id": "fJ2yVvZfTb7wIc0l",
 			"category": "VisGeneral",
-      "name": "Colors for plots",
+			"name": "Colors for plots",
 			"param_name": "colors_for_plots",
 			"description": "Comma-separated colors for PCA and histogram. Defaults to the MOSuite palette.",
 			"help_text": "Use color names or hex codes. Supplied colors are used first; if there are more groups than colors, additional colors are generated from the MOSuite palette, with random colors only if that palette is too short.",
 			"type": "text",
 			"value_type": "string",
 			"default_value": "#5954d6,#e1562c,#b80058,#00c6f8,#d163e6,#00a76c,#ff9287,#008cf9,#006e00,#796880,#FFA500,#878500"
+		},
+		{
+			"id": "vJvArGM6rjelGp9f",
+			"category": "VisGeneral",
+			"name": "Plot correlation heatmap",
+			"param_name": "plot_corr_matrix_heatmap",
+			"description": "Create a correlation matrix heatmap for sample similarity",
+			"help_text": "Set to FALSE for datasets with many samples to avoid long run times",
+			"type": "list",
+			"value_type": "string",
+			"default_value": "TRUE",
+			"extra_data": [
+				"TRUE",
+				"FALSE"
+			]
+		},
+		{
+			"id": "vJvArGM6rjelGp9g",
+			"category": "VisGeneral",
+			"name": "Interactive plots",
+			"param_name": "interactive_plots",
+			"description": "Create interactive plots with plotly (PCA and histogram)",
+			"help_text": "Interactive plots allow hovering to view sample information, but correlation heatmap will not display",
+			"type": "list",
+			"value_type": "string",
+			"default_value": "FALSE",
+			"extra_data": [
+				"TRUE",
+				"FALSE"
+			]
 		},
 		{
 			"id": "fK3zWwAgUc8xJd1m",
@@ -233,7 +263,7 @@
 			"description": "Color histogram by group instead of sample",
 			"type": "list",
 			"value_type": "string",
-			"default_value": "FALSE",
+			"default_value": "TRUE",
 			"extra_data": [
 				"TRUE",
 				"FALSE"
@@ -307,36 +337,6 @@
 			"type": "text",
 			"value_type": "integer",
 			"default_value": "6"
-		},
-		{
-			"id": "vJvArGM6rjelGp9f",
-			"category": "VisGeneral",
-			"name": "Plot correlation heatmap",
-			"param_name": "plot_corr_matrix_heatmap",
-			"description": "Create a correlation matrix heatmap for sample similarity",
-			"help_text": "Set to FALSE for datasets with many samples to avoid long run times",
-			"type": "list",
-			"value_type": "string",
-			"default_value": "TRUE",
-			"extra_data": [
-				"TRUE",
-				"FALSE"
-			]
-		},
-		{
-			"id": "vJvArGM6rjelGp9g",
-			"category": "VisGeneral",
-			"name": "Interactive plots",
-			"param_name": "interactive_plots",
-			"description": "Create interactive plots with plotly (PCA and histogram)",
-			"help_text": "Interactive plots allow hovering to view sample information, but correlation heatmap will not display",
-			"type": "list",
-			"value_type": "string",
-			"default_value": "FALSE",
-			"extra_data": [
-				"TRUE",
-				"FALSE"
-			]
 		},
 		{
 			"id": "vJvArGM6rjelGp9e",
