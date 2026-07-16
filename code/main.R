@@ -198,18 +198,16 @@ args <- parser$parse_args()
 
 # load multiOmicDataSet from data directory
 moo <- load_moo_from_data_dir()
-samples_to_rename <- parse_samples_to_rename(args$samples_to_rename)
-colors_for_plots <- parse_optional_vector(args$colors_for_plots)
 
 # run MOSuite
-moo_filt <- moo |>
+moo |>
   filter_counts(
     count_type = args$count_type,
     feature_id_colname = args$feature_id_colname,
     sample_id_colname = args$sample_id_colname,
     group_colname = args$group_colname,
     label_colname = args$label_colname,
-    samples_to_rename = samples_to_rename,
+    samples_to_rename = parse_samples_to_rename(args$samples_to_rename),
     minimum_count_value_to_be_considered_nonzero = args$minimum_count_value_to_be_considered_nonzero,
     minimum_number_of_samples_with_nonzero_counts_in_total = args$minimum_number_of_samples_with_nonzero_counts_in_total,
     minimum_number_of_samples_with_nonzero_counts_in_a_group = args$minimum_number_of_samples_with_nonzero_counts_in_a_group,
@@ -233,125 +231,7 @@ moo_filt <- moo |>
     legend_position_for_histogram = args$legend_position_for_histogram,
     number_of_histogram_legend_columns = args$number_of_histogram_legend_columns,
     plot_corr_matrix_heatmap = args$plot_corr_matrix_heatmap,
-    colors_for_plots = colors_for_plots,
-    interactive_plots = args$interactive_plots,
-    print_plots = FALSE,
-    save_plots = FALSE
-  )
-
-if (isTRUE(options::opt("print_plots")) || isTRUE(options::opt("save_plots"))) {
-  sample_metadata <- moo@sample_meta |> as.data.frame()
-  counts_dat <- moo@counts[[args$count_type]] |> as.data.frame()
-  sample_id_colname <- args$sample_id_colname
-  feature_id_colname <- args$feature_id_colname
-  label_colname <- args$label_colname
-
-  if (is.null(sample_id_colname)) {
-    sample_id_colname <- colnames(sample_metadata)[1]
-  }
-  if (is.null(feature_id_colname)) {
-    feature_id_colname <- colnames(counts_dat)[1]
-  }
-  if (is.null(label_colname)) {
-    label_colname <- sample_id_colname
-  }
-
-  samples_to_include <- sample_metadata |> dplyr::pull(sample_id_colname)
-  if (is.null(colors_for_plots)) {
-    colors_for_plots <- moo@analyses[["colors"]][[args$group_colname]]
-  } else {
-    colors_for_plots <- as.vector(colors_for_plots)
-  }
-
-  colors_for_histogram <- colors_for_plots
-  if (isFALSE(args$color_histogram_by_group)) {
-    colors_for_histogram <- moo@analyses[["colors"]][[label_colname]]
-  }
-
-  filtered_counts <- moo_filt@counts[["filt"]]
-  log_counts <- filtered_counts |>
-    dplyr::mutate(dplyr::across(
-      tidyselect::all_of(samples_to_include),
-      ~ log(.x + 0.5)
-    ))
-  pca_plot <- plot_pca(
-    log_counts,
-    sample_metadata = sample_metadata,
-    sample_id_colname = sample_id_colname,
-    feature_id_colname = feature_id_colname,
-    samples_to_rename = samples_to_rename,
-    group_colname = args$group_colname,
-    label_colname = label_colname,
-    color_values = colors_for_plots,
-    principal_components = c(
-      args$principal_component_on_x_axis,
-      args$principal_component_on_y_axis
-    ),
-    legend_position = args$legend_position_for_pca,
-    point_size = args$point_size_for_pca,
-    add_label = args$add_label_to_pca,
-    label_font_size = args$label_font_size,
-    label_offset_y_ = args$label_offset_y_,
-    label_offset_x_ = args$label_offset_x_,
-    print_plots = FALSE,
-    save_plots = FALSE
-  ) +
-    ggplot2::labs(caption = "filtered counts")
-  hist_plot <- plot_histogram(
-    log_counts,
-    sample_metadata,
-    sample_id_colname = sample_id_colname,
-    feature_id_colname = feature_id_colname,
-    group_colname = args$group_colname,
-    label_colname = label_colname,
-    color_values = colors_for_histogram,
-    color_by_group = args$color_histogram_by_group,
-    set_min_max_for_x_axis = args$set_min_max_for_x_axis_for_histogram,
-    minimum_for_x_axis = args$minimum_for_x_axis_for_histogram,
-    maximum_for_x_axis = args$maximum_for_x_axis_for_histogram,
-    legend_position = args$legend_position_for_histogram,
-    legend_font_size = parse_optional_number(args$legend_font_size_for_histogram),
-    number_of_legend_columns = args$number_of_histogram_legend_columns
-  ) +
-    ggplot2::labs(caption = "filtered counts")
-
-  plot_ext <- "png"
-  if (isTRUE(args$interactive_plots)) {
-    pca_plot <- pca_plot |> plotly::ggplotly(tooltip = c("sample", "group"))
-    hist_plot <- (hist_plot + ggplot2::theme(legend.position = "none")) |>
-      plotly::ggplotly(tooltip = c("sample"))
-    plot_ext <- "html"
-  }
-  print_or_save_plot(
-    pca_plot,
-    filename = file.path("filt", glue::glue("pca.{plot_ext}")),
-    print_plots = options::opt("print_plots"),
-    save_plots = options::opt("save_plots")
-  )
-  print_or_save_plot(
-    hist_plot,
-    filename = file.path("filt", glue::glue("histogram.{plot_ext}")),
-    print_plots = options::opt("print_plots"),
-    save_plots = options::opt("save_plots")
-  )
-  if (isTRUE(args$plot_corr_matrix_heatmap)) {
-    corHM <- plot_corr_heatmap(
-      filtered_counts[, samples_to_include],
-      sample_metadata = sample_metadata,
-      sample_id_colname = sample_id_colname,
-      feature_id_colname = feature_id_colname,
-      label_colname = label_colname,
-      group_colname = args$group_colname,
-      color_values = colors_for_plots
-    )
-    print_or_save_plot(
-      corHM,
-      filename = file.path("filt", "corr_heatmap.png"),
-      print_plots = options::opt("print_plots"),
-      save_plots = options::opt("save_plots"),
-      caption = "filtered counts"
-    )
-  }
-}
-
-write_rds(moo_filt, file.path(getOption("moo_plots_dir"), "..", "moo", "moo-filt.rds"))
+    colors_for_plots = parse_optional_vector(args$colors_for_plots),
+    interactive_plots = args$interactive_plots
+  ) |>
+  write_rds(file.path(getOption("moo_plots_dir"), "..", "moo", "moo-filt.rds"))
