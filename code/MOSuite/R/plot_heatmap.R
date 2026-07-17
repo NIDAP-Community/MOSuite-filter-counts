@@ -105,7 +105,9 @@ S7::method(plot_corr_heatmap, multiOmicDataSet) <- function(
 #'   labels to display on your figure (e.g. shorter labels are sometimes preferred on plots). In that case, select the
 #'   column with your preferred Labels here. The selected column should contain unique names for each sample. (Default:
 #'   `NULL` -- `sample_id_colname` will be used.)
-#' @param color_values vector of colors as hex values or names recognized by R
+#' @param color_values vector of colors as hex values or names recognized by R. Unnamed colors are assigned by factor
+#'   level order when the grouping column is a factor; otherwise, they are assigned in the order groups first appear in
+#'   the metadata column.
 #'
 #' @rdname plot_corr_heatmap-data.frame
 #' @aliases plot_corr_heatmap.data.frame
@@ -154,20 +156,8 @@ S7::method(plot_corr_heatmap, S7::class_data.frame) <- function(
   # cannot set rownames on a tibble
   sample_metadata <- sample_metadata |> as.data.frame()
   rownames(sample_metadata) <- sample_metadata[[label_colname]]
-  annoVal <- lapply(group_colname, function(x) {
-    # TODO this only works on dataframes, not tibbles
-    out <- as.factor(sample_metadata |> dplyr::pull(x)) |> levels()
-    # names(out)=x
-    return(out)
-  }) |>
-    unlist()
-  col <- color_values[seq_along(annoVal)]
-  names(col) <- annoVal
-
   cols <- lapply(group_colname, function(x) {
-    ax <- as.factor(sample_metadata |> dplyr::pull(x)) |> levels()
-    out <- col[ax]
-    return(out)
+    return(resolve_plot_colors(sample_metadata, x, color_values))
   })
   names(cols) <- (group_colname)
 
@@ -255,7 +245,9 @@ S7::method(plot_corr_heatmap, S7::class_data.frame) <- function(
 #'   labels to display on your figure (e.g. shorter labels are sometimes preferred on plots). In that case, select the
 #'   column with your preferred Labels here. The selected column should contain unique names for each sample. (Default:
 #'   `NULL` -- `sample_id_colname` will be used.)
-#' @param color_values vector of colors as hex values or names recognized by R
+#' @param color_values vector of colors as hex values or names recognized by R. Unnamed colors are assigned by factor
+#'   level order when the grouping column is a factor; otherwise, they are assigned in the order groups first appear in
+#'   the metadata column.
 #' @param samples_to_include Which samples would you like to include? Usually, you will choose all sample columns, or
 #'   you could choose to remove certain samples. Samples excluded here will be removed in this step and from further
 #'   analysis downstream of this step. (Default: `NULL` - all sample IDs in `moo@sample_meta` will be used.)
@@ -1026,24 +1018,37 @@ S7::method(plot_expr_heatmap, S7::class_data.frame) <- function(
   annotation_col[] <- lapply(annotation_col, factor)
   x <- length(unlist(lapply(annotation_col, levels)))
   if (x > length(group_colors)) {
-    k <- x - length(group_colors)
-    more_cols <- get_random_colors(k)
+    generated_group_colors <- get_colors_vctr(
+      data.frame(group_color_index = seq_len(x)),
+      "group_color_index"
+    )
+    more_cols <- unname(generated_group_colors)[seq.int(
+      length(group_colors) + 1,
+      x
+    )]
     group_colors <- c(group_colors, more_cols)
   }
   rownames(annotation_col) <- annot[[label_colname]]
   annot_col <- list()
-  b <- 1
-  i <- 1
-  while (i <= length(group_columns)) {
-    cnam <- group_columns[i]
-    grp <- as.factor(annotation_col[, i])
-    c <- b + length(levels(grp)) - 1
-    col <- group_colors[b:c]
-    names(col) <- levels(grp)
-    assign(cnam, col)
-    annot_col <- append(annot_col, mget(cnam))
-    b <- c + 1
-    i <- i + 1
+  next_color <- 1
+  for (cnam in group_columns) {
+    group_levels <- stats::na.omit(unique(annot[[cnam]]))
+
+    if (
+      !is.null(names(group_colors)) &&
+        all(as.character(group_levels) %in% names(group_colors))
+    ) {
+      col <- resolve_plot_colors(annot, cnam, group_colors)
+    } else {
+      color_slice <- group_colors[
+        next_color:(next_color + length(group_levels) - 1)
+      ]
+      col <- resolve_plot_colors(annot, cnam, color_slice)
+    }
+
+    next_color <- next_color + length(group_levels)
+
+    annot_col[[cnam]] <- col
   }
 
   if (assign_group_colors == TRUE) {

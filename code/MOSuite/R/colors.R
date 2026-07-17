@@ -32,13 +32,43 @@ get_random_colors <- function(num_colors, n = 2e3) {
   return(unname(colorspace::hex(colorspace::LAB(km$centers))))
 }
 
+get_mosuite_colors <- function(n, ...) {
+  colors <- c(
+    "#5954d6",
+    "#e1562c",
+    "#b80058",
+    "#00c6f8",
+    "#d163e6",
+    "#00a76c",
+    "#ff9287",
+    "#008cf9",
+    "#006e00",
+    "#796880",
+    "#FFA500",
+    "#878500"
+  )
+  return(colors[seq_len(min(n, length(colors)))])
+}
+
+get_observed_values <- function(dat, colname) {
+  values <- dplyr::pull(dat, colname)
+  observed_values <- stats::na.omit(as.character(values))
+
+  if (is.factor(values)) {
+    return(levels(values)[levels(values) %in% observed_values])
+  }
+
+  return(unique(observed_values))
+}
+
 
 #' Create named list of default colors for plotting
 #'
 #' @inheritParams create_multiOmicDataSet_from_dataframes
 #'
-#' @param palette_fun Function for selecting colors. Assumed to contain `n` for the number of colors. Default:
-#'   `grDevices::palette.colors()`
+#' @param palette_fun Function for selecting colors. Assumed to contain `n` for the number of colors. Defaults to
+#'   MOSuite's default plot palette. To use the previous R default palette behavior, pass
+#'   `grDevices::palette.colors`.
 #' @param ... additional arguments forwarded to `palette_fun`
 #'
 #' @returns named list, with each column in `sample_metadata` containing entry with a named vector of colors
@@ -51,7 +81,7 @@ get_random_colors <- function(num_colors, n = 2e3) {
 #' }
 get_colors_lst <- function(
   sample_metadata,
-  palette_fun = grDevices::palette.colors,
+  palette_fun = get_mosuite_colors,
   ...
 ) {
   dat_colnames <- colnames(sample_metadata)
@@ -71,18 +101,17 @@ get_colors_lst <- function(
 #' @inheritParams get_colors_lst
 #' @param dat data frame
 #' @param colname column name in `dat`
-#' @returns named vector of colors for each unique observation in `dat$colname`
+#' @returns named vector of colors for each unique observation in `dat$colname`. Factor columns use factor level order;
+#'   other columns use first-observed order.
 #' @export
 #'
 get_colors_vctr <- function(
   dat,
   colname,
-  palette_fun = grDevices::palette.colors,
+  palette_fun = get_mosuite_colors,
   ...
 ) {
-  obs <- dat |>
-    dplyr::pull(colname) |>
-    unique()
+  obs <- get_observed_values(dat, colname)
   n_obs <- length(obs)
 
   warned_cnd <- NULL
@@ -118,6 +147,49 @@ get_colors_vctr <- function(
   return(colors_vctr)
 }
 
+resolve_plot_colors <- function(
+  dat,
+  colname,
+  color_values = NULL,
+  palette_fun = get_mosuite_colors,
+  ...
+) {
+  obs <- get_observed_values(dat, colname)
+
+  if (length(obs) == 0) {
+    return(color_values)
+  }
+
+  if (is.null(color_values)) {
+    return(get_colors_vctr(dat, colname, palette_fun = palette_fun, ...))
+  }
+
+  if (!is.null(names(color_values))) {
+    if (all(obs %in% names(color_values))) {
+      return(color_values)
+    }
+  }
+
+  if (length(color_values) < length(obs)) {
+    n_missing <- length(obs) - length(color_values)
+    message(glue::glue(
+      "color_values contains {length(color_values)} colors for {length(obs)} values in column {colname}. Generating {n_missing} additional colors."
+    ))
+    generated_colors <- get_colors_vctr(
+      dat,
+      colname,
+      palette_fun = palette_fun,
+      ...
+    )
+    color_values <- c(
+      unname(color_values),
+      unname(generated_colors)[seq.int(length(color_values) + 1, length(obs))]
+    )
+  }
+
+  return(stats::setNames(unname(color_values)[seq_along(obs)], obs))
+}
+
 #' Set color palette for a single group/column
 #'
 #' This allows you to set custom palettes individually for groups in the dataset
@@ -143,7 +215,7 @@ get_colors_vctr <- function(
 set_color_pal <- S7::new_generic(
   "set_color_pal",
   "moo",
-  function(moo, colname, palette_fun = grDevices::palette.colors, ...) {
+  function(moo, colname, palette_fun = get_mosuite_colors, ...) {
     return(S7::S7_dispatch())
   }
 )
@@ -151,7 +223,7 @@ set_color_pal <- S7::new_generic(
 S7::method(set_color_pal, multiOmicDataSet) <- function(
   moo,
   colname,
-  palette_fun = grDevices::palette.colors,
+  palette_fun = get_mosuite_colors,
   ...
 ) {
   moo@analyses[["colors"]][[colname]] <- get_colors_vctr(
