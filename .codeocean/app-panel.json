@@ -87,7 +87,7 @@
 			"description": "Minimum count value to be considered non-zero for a sample",
 			"type": "text",
 			"value_type": "integer",
-			"default_value": "1"
+			"default_value": "3"
 		},
 		{
 			"id": "vJvArGM6rjelGp9a",
@@ -97,7 +97,7 @@
 			"description": "Minimum number of samples (total) with non-zero counts",
 			"type": "text",
 			"value_type": "integer",
-			"default_value": "7"
+			"default_value": "1"
 		},
 		{
 			"id": "vJvArGM6rjelGp9b",
