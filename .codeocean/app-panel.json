@@ -119,10 +119,11 @@
 			"category": "VisGeneral",
 			"name": "Label column name",
 			"param_name": "label_colname",
-			"description": "Column from sample metadata with labels for plots (e.g. shortened sample names)",
-			"help_text": "Leave blank to use the sample ID column",
+			"description": "Column name from sample metadata table for sample labels used in heatmap and PCA figures.",
+			"help_text": "Defaults to Label. Use Add labels to PCA to control whether these labels appear on PCA points.",
 			"type": "text",
-			"value_type": "string"
+			"value_type": "string",
+			"default_value": "Label"
 		},
 		{
 			"id": "fJ2yVvZfTb7wIc0l",
@@ -160,20 +161,6 @@
 			"type": "list",
 			"value_type": "string",
 			"default_value": "FALSE",
-			"extra_data": [
-				"TRUE",
-				"FALSE"
-			]
-		},
-		{
-			"id": "fK3zWwAgUc8xJd1m",
-			"category": "VisPCA",
-			"name": "Add labels to PCA",
-			"param_name": "add_label_to_pca",
-			"description": "Label points on the PCA plot",
-			"type": "list",
-			"value_type": "string",
-			"default_value": "TRUE",
 			"extra_data": [
 				"TRUE",
 				"FALSE"
@@ -254,6 +241,21 @@
 			"type": "text",
 			"value_type": "number",
 			"default_value": "5"
+		},
+		{
+			"id": "fR0gDdHnBj5eQk8u",
+			"category": "VisPCA",
+			"name": "Add labels to PCA",
+			"param_name": "add_label_to_pca",
+			"description": "Display labels from the sample metadata column selected in the \"Label column name\" parameter on PCA points.",
+			"help_text": "Set FALSE to remove labels from PCA points.",
+			"type": "list",
+			"value_type": "string",
+			"default_value": "TRUE",
+			"extra_data": [
+				"TRUE",
+				"FALSE"
+			]
 		},
 		{
 			"id": "fS1hEeIoCk6fRl9u",
