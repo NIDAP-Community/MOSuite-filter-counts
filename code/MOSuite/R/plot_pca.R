@@ -122,20 +122,6 @@ S7::method(plot_pca, S7::class_data.frame) <- function(
   )
 }
 
-build_pca_hover_text <- function(pca_data, sample_id_colname, group_colname, label_colname = NULL) {
-  label_hover_colname <- if (is.null(label_colname)) sample_id_colname else label_colname
-
-  paste0(
-    label_hover_colname,
-    ": ",
-    pca_data[[label_hover_colname]],
-    "<br>",
-    group_colname,
-    ": ",
-    pca_data[[group_colname]]
-  )
-}
-
 #' Perform and plot a 2D Principal Components Analysis
 #'
 #' @rdname plot_pca_2d
@@ -170,7 +156,7 @@ plot_pca_2d <- S7::new_generic(
     ),
     principal_components = c(1, 2),
     legend_position = "top",
-    point_size = 5,
+    point_size = 3,
     legend_font_size = NULL,
     label_font_size = 3,
     label_offset_x_ = 2,
@@ -212,7 +198,7 @@ S7::method(plot_pca_2d, multiOmicDataSet) <- function(
   ),
   principal_components = c(1, 2),
   legend_position = "top",
-  point_size = 5,
+  point_size = 3,
   legend_font_size = NULL,
   label_font_size = 3,
   label_offset_x_ = 2,
@@ -324,7 +310,7 @@ S7::method(plot_pca_2d, S7::class_data.frame) <- function(
   ),
   principal_components = c(1, 2),
   legend_position = "top",
-  point_size = 5,
+  point_size = 3,
   legend_font_size = NULL,
   label_font_size = 3,
   label_offset_x_ = 2,
@@ -369,12 +355,6 @@ S7::method(plot_pca_2d, S7::class_data.frame) <- function(
       names_prefix = "PC",
       values_from = "value"
     )
-  pca_wide$pca_hover_text <- build_pca_hover_text(
-    pca_wide,
-    sample_id_colname,
-    group_colname,
-    label_colname
-  )
   prin_comp_x <- principal_components[1]
   prin_comp_y <- principal_components[2]
   color_values <- resolve_plot_colors(pca_wide, group_colname, color_values)
@@ -390,7 +370,7 @@ S7::method(plot_pca_2d, S7::class_data.frame) <- function(
     ggplot2::ggplot(ggplot2::aes(
       x = !!rlang::sym(glue::glue("PC{prin_comp_x}")),
       y = !!rlang::sym(glue::glue("PC{prin_comp_y}")),
-      text = pca_hover_text
+      text = !!rlang::sym(sample_id_colname)
     )) +
     ggplot2::geom_point(
       ggplot2::aes(color = !!rlang::sym(group_colname)),
@@ -441,7 +421,7 @@ S7::method(plot_pca_2d, S7::class_data.frame) <- function(
   }
   if (isTRUE(interactive_plots)) {
     pca_plot <- (pca_plot) |>
-      plotly::ggplotly(tooltip = "text")
+      plotly::ggplotly(tooltip = c(sample_id_colname, group_colname))
   }
 
   if (inherits(pca_plot, "ggplot")) {
@@ -667,12 +647,6 @@ S7::method(plot_pca_3d, S7::class_data.frame) <- function(
       names_prefix = "PC",
       values_from = "value"
     )
-  pca_wide$pca_hover_text <- build_pca_hover_text(
-    pca_wide,
-    sample_id_colname,
-    group_colname,
-    label_colname
-  )
   prin_comp_x <- principal_components[1]
   prin_comp_y <- principal_components[2]
   prin_comp_z <- principal_components[3]
@@ -689,7 +663,7 @@ S7::method(plot_pca_3d, S7::class_data.frame) <- function(
     mode = "markers",
     marker = list(size = point_size),
     hoverinfo = "text",
-    text = ~pca_hover_text,
+    text = stats::as.formula(paste("~", sample_id_colname)),
     size = label_font_size
   )
 
