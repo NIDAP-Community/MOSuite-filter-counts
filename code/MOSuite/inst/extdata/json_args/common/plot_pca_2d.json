@@ -11,6 +11,7 @@
     2
   ],
   "point_size": 3,
+  "add_label": true,
   "label_font_size": 3,
   "legend_position": "top",
   "color_values": [
