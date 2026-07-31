@@ -38,6 +38,12 @@ parser$add_argument(
   help = "Column name for sample IDs"
 )
 parser$add_argument(
+  "--samples_to_include",
+  type = "character",
+  default = "",
+  help = "Comma-separated list of samples to include"
+)
+parser$add_argument(
   "--group_colname",
   type = "character",
   default = "Group",
@@ -205,6 +211,7 @@ moo |>
     count_type = args$count_type,
     feature_id_colname = args$feature_id_colname,
     sample_id_colname = args$sample_id_colname,
+    samples_to_include = parse_optional_vector(args$samples_to_include),
     group_colname = args$group_colname,
     label_colname = args$label_colname,
     samples_to_rename = parse_samples_to_rename(args$samples_to_rename),

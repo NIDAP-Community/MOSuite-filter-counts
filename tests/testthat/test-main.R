@@ -1,3 +1,24 @@
+test_that("app panel exposes samples_to_include accepted by main.R", {
+  repo_root <- normalizePath(
+    file.path(testthat::test_path(), "..", ".."),
+    mustWork = TRUE
+  )
+  panel <- jsonlite::fromJSON(
+    file.path(repo_root, ".codeocean", "app-panel.json")
+  )
+  main_text <- paste(
+    readLines(file.path(repo_root, "code", "main.R"), warn = FALSE),
+    collapse = "\n"
+  )
+
+  expect_true("samples_to_include" %in% panel$parameters$param_name)
+  expect_match(main_text, '"--samples_to_include"')
+  expect_match(
+    main_text,
+    "samples_to_include = parse_optional_vector\\(args\\$samples_to_include\\)"
+  )
+})
+
 test_that("code/run executes successfully with default CLI arguments", {
   setup <- setup_cli_workspace("mosuite_filter_counts_test_")
   on.exit(unlink(setup$workspace, recursive = TRUE), add = TRUE)

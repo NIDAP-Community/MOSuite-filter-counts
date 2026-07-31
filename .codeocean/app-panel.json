@@ -385,6 +385,16 @@
 			"value_type": "string"
 		},
 		{
+			"id": "samples_to_include_id",
+			"category": "XqgPq28Eo5VCFSZu",
+			"name": "Samples to include",
+			"param_name": "samples_to_include",
+			"description": "Comma-separated list of sample IDs to include",
+			"help_text": "Leave blank to include all samples",
+			"type": "text",
+			"value_type": "string"
+		},
+		{
 			"id": "fI1xUuYeSa6vHb9k",
 			"category": "XqgPq28Eo5VCFSZu",
 			"name": "Samples to rename",
