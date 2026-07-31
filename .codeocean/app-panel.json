@@ -60,7 +60,7 @@
 			"category": "gn9FXwemlVazWQIo",
 			"name": "Count type",
 			"param_name": "count_type",
-			"description": "Type of counts to filter. Must be a count type in names(moo@counts)",
+			"description": "Type of counts to filter. Must be a count type in names(moo@counts). Counts table should not be log-transformed.",
 			"type": "list",
 			"value_type": "string",
 			"default_value": "clean",
