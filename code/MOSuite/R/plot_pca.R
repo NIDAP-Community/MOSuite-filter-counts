@@ -29,6 +29,12 @@
 #'
 #' @details
 #'
+#'  PCA is sensitive to feature scale. For raw, cleaned, filtered, or CPM-like count data, setting
+#'  `log_transform = TRUE` compresses high-count features before PCA so ordination is less dominated by abundance
+#'  differences. Do not enable this for already normalized/log-scale data, such as voom/logCPM `norm` counts or
+#'  batch-corrected normalized counts, because that would apply a second log transform. The default PCA transform uses
+#'  the original MOSuite PCA scaling, `log(x + 0.5)`.
+#'
 #'  See the low-level function docs for additional arguments
 #'  depending on whether you're plotting 2 or 3 PCs:
 #'
@@ -122,6 +128,27 @@ S7::method(plot_pca, S7::class_data.frame) <- function(
   )
 }
 
+build_pca_hover_text <- function(
+  pca_data,
+  sample_id_colname,
+  group_colname,
+  label_colname = NULL
+) {
+  label_hover_colname <- if (is.null(label_colname)) {
+    sample_id_colname
+  } else {
+    label_colname
+  }
+
+  return(format_hover_text(
+    pca_data,
+    primary_colname = label_hover_colname,
+    secondary_colname = group_colname,
+    missing_col_context = "PCA",
+    require_secondary = TRUE
+  ))
+}
+
 #' Perform and plot a 2D Principal Components Analysis
 #'
 #' @rdname plot_pca_2d
@@ -140,33 +167,23 @@ plot_pca_2d <- S7::new_generic(
     group_colname = "Group",
     label_colname = "Label",
     samples_to_rename = NULL,
-    color_values = c(
-      "#5954d6",
-      "#e1562c",
-      "#b80058",
-      "#00c6f8",
-      "#d163e6",
-      "#00a76c",
-      "#ff9287",
-      "#008cf9",
-      "#006e00",
-      "#796880",
-      "#FFA500",
-      "#878500"
-    ),
+    color_values = NULL,
     principal_components = c(1, 2),
     legend_position = "top",
-    point_size = 3,
-    add_label = TRUE,
+    point_size = 5,
     legend_font_size = NULL,
     label_font_size = 3,
     label_offset_x_ = 2,
     label_offset_y_ = 2,
+    log_transform = FALSE,
+    log_transform_pseudocount = 0.5,
+    log_transform_base = "ln",
     interactive_plots = FALSE,
     plots_subdir = "pca",
     plot_filename = "pca_2D.png",
     print_plots = options::opt("print_plots"),
-    save_plots = options::opt("save_plots")
+    save_plots = options::opt("save_plots"),
+    ...
   ) {
     return(S7::S7_dispatch())
   }
@@ -183,35 +200,26 @@ S7::method(plot_pca_2d, multiOmicDataSet) <- function(
   group_colname = "Group",
   label_colname = "Label",
   samples_to_rename = NULL,
-  color_values = c(
-    "#5954d6",
-    "#e1562c",
-    "#b80058",
-    "#00c6f8",
-    "#d163e6",
-    "#00a76c",
-    "#ff9287",
-    "#008cf9",
-    "#006e00",
-    "#796880",
-    "#FFA500",
-    "#878500"
-  ),
+  color_values = NULL,
   principal_components = c(1, 2),
   legend_position = "top",
-  point_size = 3,
-  add_label = TRUE,
+  point_size = 5,
   legend_font_size = NULL,
   label_font_size = 3,
   label_offset_x_ = 2,
   label_offset_y_ = 2,
+  log_transform = FALSE,
+  log_transform_pseudocount = 0.5,
+  log_transform_base = "ln",
   interactive_plots = FALSE,
   plots_subdir = "pca",
   plot_filename = "pca_2D.png",
   print_plots = options::opt("print_plots"),
-  save_plots = options::opt("save_plots")
+  save_plots = options::opt("save_plots"),
+  ...
 ) {
   counts_dat <- extract_counts(moo_counts, count_type, sub_count_type)
+  color_values <- color_values %||% moo_counts@analyses$colors[[group_colname]]
   return(plot_pca_2d(
     counts_dat,
     sample_metadata = moo_counts@sample_meta,
@@ -224,11 +232,13 @@ S7::method(plot_pca_2d, multiOmicDataSet) <- function(
     principal_components = principal_components,
     legend_position = legend_position,
     point_size = point_size,
-    add_label = add_label,
     legend_font_size = legend_font_size,
     label_font_size = label_font_size,
     label_offset_x_ = label_offset_x_,
     label_offset_y_ = label_offset_y_,
+    log_transform = log_transform,
+    log_transform_pseudocount = log_transform_pseudocount,
+    log_transform_base = log_transform_base,
     interactive_plots = interactive_plots,
     plots_subdir = plots_subdir,
     plot_filename = plot_filename,
@@ -255,22 +265,22 @@ S7::method(plot_pca_2d, multiOmicDataSet) <- function(
 #' @param group_colname The column from the sample metadata containing the sample group information. This is usually a
 #'   column showing to which experimental treatments each sample belongs (e.g. WildType, Knockout, Tumor, Normal,
 #'   Before, After, etc.).
-#' @param label_colname The column from the sample metadata containing the sample labels as you wish them to appear in
-#'   the plots produced by this template. This can be the same Sample Names Column. However, you may desire different
-#'   labels to display on your figure (e.g. shorter labels are sometimes preferred on plots). In that case, select the
-#'   column with your preferred Labels here. The selected column should contain unique names for each sample. (Default:
-#'   `NULL` -- `sample_id_colname` will be used.)
+#' @param label_colname The column from the sample metadata containing the sample labels as you wish them to appear on
+#'   the PCA plot. If `NULL`, no labels are added to PCA points. This can be the same Sample Names Column. However, you
+#'   may desire different labels to display on your figure (e.g. shorter labels are sometimes preferred on plots). In
+#'   that case, select the column with your preferred Labels here. The selected column should contain unique names for
+#'   each sample.
 #' @param samples_to_rename If you do not have a Plot Labels Column in your sample metadata table, you can use this
 #'   parameter to rename samples manually for display on the PCA plot. Use "Add item" to add each additional sample for
 #'   renaming. Use the following format to describe which old name (in your sample metadata table) you want to rename to
 #'   which new name: old_name: new_name
 #' @param color_values vector of colors as hex values or names recognized by R. Unnamed colors are assigned by factor
 #'   level order when the grouping column is a factor; otherwise, they follow the order in which groups first appear in
-#'   the metadata column.
+#'   the metadata column. Defaults to `NULL`; when `NULL`, `mosuite_palette` is used for `data.frame` dispatch and
+#'   stored colors are used for `multiOmicDataSet` dispatch.
 #' @param principal_components vector with numbered principal components to plot
 #' @param legend_position passed to in `legend.position` `ggplot2::theme()`
 #' @param point_size size for `ggplot2::geom_point()`
-#' @param add_label whether to add text labels for the points
 #' @param legend_font_size font size for the PCA legend text. If `NULL`, the size is scaled automatically based on the
 #'   number and length of legend labels.
 #' @param count_type the type of counts to use when `moo_counts` is a `multiOmicDataSet`; ignored for data frame input.
@@ -278,6 +288,13 @@ S7::method(plot_pca_2d, multiOmicDataSet) <- function(
 #' @param label_font_size font size for text labels on the PCA plot.
 #' @param label_offset_x_ horizontal offset for text labels on the PCA plot.
 #' @param label_offset_y_ vertical offset for text labels on the PCA plot.
+#' @param log_transform If `TRUE`, apply `log(x + log_transform_pseudocount, base = log_transform_base)` to sample
+#'   count columns before PCA. Use this for count-like data such as raw, clean, filt, or CPM-like counts; leave it
+#'   `FALSE` for already normalized/log-scale or batch-corrected values to avoid double transformation.
+#' @param log_transform_pseudocount Pseudocount added before log-transforming counts when `log_transform` is
+#'   `TRUE`.
+#' @param log_transform_base Logarithm base to use when `log_transform` is `TRUE`. Use a numeric value, or `"e"`,
+#'   `"ln"`, or `"natural"` for natural log. Default is `"ln"` to match the original PCA transform.
 #' @param interactive_plots set to TRUE to make the PCA plot interactive with `plotly`.
 #' @param plots_subdir subdirectory in `figures/` where PCA plots are saved.
 #' @param plot_filename output filename for the PCA plot image.
@@ -298,35 +315,26 @@ S7::method(plot_pca_2d, S7::class_data.frame) <- function(
   group_colname = "Group",
   label_colname = "Label",
   samples_to_rename = NULL,
-  color_values = c(
-    "#5954d6",
-    "#e1562c",
-    "#b80058",
-    "#00c6f8",
-    "#d163e6",
-    "#00a76c",
-    "#ff9287",
-    "#008cf9",
-    "#006e00",
-    "#796880",
-    "#FFA500",
-    "#878500"
-  ),
+  color_values = NULL,
   principal_components = c(1, 2),
   legend_position = "top",
-  point_size = 3,
-  add_label = TRUE,
+  point_size = 5,
   legend_font_size = NULL,
   label_font_size = 3,
   label_offset_x_ = 2,
   label_offset_y_ = 2,
+  log_transform = FALSE,
+  log_transform_pseudocount = 0.5,
+  log_transform_base = "ln",
   interactive_plots = FALSE,
   plots_subdir = "pca",
   plot_filename = "pca_2D.png",
   print_plots = options::opt("print_plots"),
-  save_plots = options::opt("save_plots")
+  save_plots = options::opt("save_plots"),
+  ...
 ) {
   PC <- std.dev <- percent <- cumulative <- NULL
+  color_values <- color_values %||% mosuite_palette
   if (length(principal_components) != 2) {
     stop(
       glue::glue(
@@ -340,6 +348,14 @@ S7::method(plot_pca_2d, S7::class_data.frame) <- function(
   }
   if (is.null(feature_id_colname)) {
     feature_id_colname <- colnames(moo_counts)[1]
+  }
+  if (isTRUE(log_transform)) {
+    moo_counts <- log_transform_counts(
+      moo_counts,
+      feature_id_colname = feature_id_colname,
+      pseudocount = log_transform_pseudocount,
+      base = log_transform_base
+    )
   }
 
   # calculate PCA
@@ -360,6 +376,12 @@ S7::method(plot_pca_2d, S7::class_data.frame) <- function(
       names_prefix = "PC",
       values_from = "value"
     )
+  pca_wide$pca_hover_text <- build_pca_hover_text(
+    pca_wide,
+    sample_id_colname,
+    group_colname,
+    label_colname
+  )
   prin_comp_x <- principal_components[1]
   prin_comp_y <- principal_components[2]
   color_values <- resolve_plot_colors(pca_wide, group_colname, color_values)
@@ -375,7 +397,7 @@ S7::method(plot_pca_2d, S7::class_data.frame) <- function(
     ggplot2::ggplot(ggplot2::aes(
       x = !!rlang::sym(glue::glue("PC{prin_comp_x}")),
       y = !!rlang::sym(glue::glue("PC{prin_comp_y}")),
-      text = !!rlang::sym(sample_id_colname)
+      text = pca_hover_text
     )) +
     ggplot2::geom_point(
       ggplot2::aes(color = !!rlang::sym(group_colname)),
@@ -410,7 +432,7 @@ S7::method(plot_pca_2d, S7::class_data.frame) <- function(
     legend_text_size = legend_font_size
   )
 
-  if (add_label == TRUE) {
+  if (!is.null(label_colname)) {
     abort_packages_not_installed("ggrepel")
     pca_plot <- pca_plot +
       ggrepel::geom_text_repel(
@@ -426,7 +448,7 @@ S7::method(plot_pca_2d, S7::class_data.frame) <- function(
   }
   if (isTRUE(interactive_plots)) {
     pca_plot <- (pca_plot) |>
-      plotly::ggplotly(tooltip = c(sample_id_colname, group_colname))
+      plotly::ggplotly(tooltip = "text")
   }
 
   if (inherits(pca_plot, "ggplot")) {
@@ -455,6 +477,7 @@ S7::method(plot_pca_2d, S7::class_data.frame) <- function(
 #'
 #' @rdname plot_pca_3d
 #' @aliases plot_pca_3d
+#' @param ... additional arguments passed to methods
 #' @export
 plot_pca_3d <- S7::new_generic(
   "plot_pca_3d",
@@ -472,25 +495,16 @@ plot_pca_3d <- S7::new_generic(
     principal_components = c(1, 2, 3),
     point_size = 8,
     label_font_size = 24,
-    color_values = c(
-      "#5954d6",
-      "#e1562c",
-      "#b80058",
-      "#00c6f8",
-      "#d163e6",
-      "#00a76c",
-      "#ff9287",
-      "#008cf9",
-      "#006e00",
-      "#796880",
-      "#FFA500",
-      "#878500"
-    ),
+    log_transform = FALSE,
+    log_transform_pseudocount = 0.5,
+    log_transform_base = "ln",
+    color_values = NULL,
     plot_title = "PCA 3D",
     plot_filename = "pca_3D.html",
     print_plots = options::opt("print_plots"),
     save_plots = options::opt("save_plots"),
-    plots_subdir = "pca"
+    plots_subdir = "pca",
+    ...
   ) {
     return(S7::S7_dispatch())
   }
@@ -510,27 +524,19 @@ S7::method(plot_pca_3d, multiOmicDataSet) <- function(
   principal_components = c(1, 2, 3),
   point_size = 8,
   label_font_size = 24,
-  color_values = c(
-    "#5954d6",
-    "#e1562c",
-    "#b80058",
-    "#00c6f8",
-    "#d163e6",
-    "#00a76c",
-    "#ff9287",
-    "#008cf9",
-    "#006e00",
-    "#796880",
-    "#FFA500",
-    "#878500"
-  ),
+  log_transform = FALSE,
+  log_transform_pseudocount = 0.5,
+  log_transform_base = "ln",
+  color_values = NULL,
   plot_title = "PCA 3D",
   plot_filename = "pca_3D.html",
   print_plots = options::opt("print_plots"),
   save_plots = options::opt("save_plots"),
-  plots_subdir = "pca"
+  plots_subdir = "pca",
+  ...
 ) {
   counts_dat <- extract_counts(moo_counts, count_type, sub_count_type)
+  color_values <- color_values %||% moo_counts@analyses$colors[[group_colname]]
   return(
     plot_pca_3d(
       counts_dat,
@@ -545,6 +551,9 @@ S7::method(plot_pca_3d, multiOmicDataSet) <- function(
       principal_components = principal_components,
       point_size = point_size,
       label_font_size = label_font_size,
+      log_transform = log_transform,
+      log_transform_pseudocount = log_transform_pseudocount,
+      log_transform_base = log_transform_base,
       color_values = color_values,
       plot_title = plot_title,
       plot_filename = plot_filename,
@@ -569,7 +578,8 @@ S7::method(plot_pca_3d, multiOmicDataSet) <- function(
 #' @param label_font_size font size used for labels in the interactive figure.
 #' @param color_values vector of colors as hex values or names recognized by R. Unnamed colors are assigned by factor
 #'   level order when the grouping column is a factor; otherwise, they follow the order in which groups first appear in
-#'   the metadata column.
+#'   the metadata column. Defaults to `NULL`; when `NULL`, `mosuite_palette` is used for `data.frame` dispatch and
+#'   stored colors are used for `multiOmicDataSet` dispatch.
 #' @param plot_filename output filename when saving plots.
 #' @param print_plots whether to print plot to the active graphics device.
 #' @param save_plots whether to save plot to disk.
@@ -577,6 +587,13 @@ S7::method(plot_pca_3d, multiOmicDataSet) <- function(
 #'
 #' @param principal_components vector with numbered principal components to plot
 #' @param point_size size for `ggplot2::geom_point()`
+#' @param log_transform If `TRUE`, apply `log(x + log_transform_pseudocount, base = log_transform_base)` to sample
+#'   count columns before PCA. Use this for count-like data such as raw, clean, filt, or CPM-like counts; leave it
+#'   `FALSE` for already normalized/log-scale or batch-corrected values to avoid double transformation.
+#' @param log_transform_pseudocount Pseudocount added before log-transforming counts when `log_transform` is
+#'   `TRUE`.
+#' @param log_transform_base Logarithm base to use when `log_transform` is `TRUE`. Use a numeric value, or `"e"`,
+#'   `"ln"`, or `"natural"` for natural log. Default is `"ln"` to match the original PCA transform.
 #' @param plot_title title for the plot
 #'
 #' @returns `plotly::plot_ly` figure
@@ -597,27 +614,19 @@ S7::method(plot_pca_3d, S7::class_data.frame) <- function(
   principal_components = c(1, 2, 3),
   point_size = 8,
   label_font_size = 24,
-  color_values = c(
-    "#5954d6",
-    "#e1562c",
-    "#b80058",
-    "#00c6f8",
-    "#d163e6",
-    "#00a76c",
-    "#ff9287",
-    "#008cf9",
-    "#006e00",
-    "#796880",
-    "#FFA500",
-    "#878500"
-  ),
+  log_transform = FALSE,
+  log_transform_pseudocount = 0.5,
+  log_transform_base = "ln",
+  color_values = NULL,
   plot_title = "PCA 3D",
   plot_filename = "pca_3D.html",
   print_plots = options::opt("print_plots"),
   save_plots = options::opt("save_plots"),
-  plots_subdir = "pca"
+  plots_subdir = "pca",
+  ...
 ) {
   PC <- std.dev <- percent <- cumulative <- NULL
+  color_values <- color_values %||% mosuite_palette
   if (length(principal_components) != 3) {
     stop(
       glue::glue(
@@ -631,6 +640,17 @@ S7::method(plot_pca_3d, S7::class_data.frame) <- function(
   }
   if (is.null(sample_id_colname)) {
     sample_id_colname <- colnames(sample_metadata)[1]
+  }
+  if (is.null(feature_id_colname)) {
+    feature_id_colname <- colnames(moo_counts)[1]
+  }
+  if (isTRUE(log_transform)) {
+    moo_counts <- log_transform_counts(
+      moo_counts,
+      feature_id_colname = feature_id_colname,
+      pseudocount = log_transform_pseudocount,
+      base = log_transform_base
+    )
   }
 
   # if (is.null(color_values)) {
@@ -652,6 +672,12 @@ S7::method(plot_pca_3d, S7::class_data.frame) <- function(
       names_prefix = "PC",
       values_from = "value"
     )
+  pca_wide$pca_hover_text <- build_pca_hover_text(
+    pca_wide,
+    sample_id_colname,
+    group_colname,
+    label_colname
+  )
   prin_comp_x <- principal_components[1]
   prin_comp_y <- principal_components[2]
   prin_comp_z <- principal_components[3]
@@ -668,7 +694,7 @@ S7::method(plot_pca_3d, S7::class_data.frame) <- function(
     mode = "markers",
     marker = list(size = point_size),
     hoverinfo = "text",
-    text = stats::as.formula(paste("~", sample_id_colname)),
+    text = ~pca_hover_text,
     size = label_font_size
   )
 
@@ -745,6 +771,13 @@ calc_pca <- function(
   tedf_filt <- tedf[, colSums(is.na(tedf)) != nrow(tedf)]
   # remove samples with zero variance
   tedf_var <- tedf_filt[, apply(tedf_filt, 2, var) != 0]
+  if (ncol(tedf_var) == 0) {
+    stop(
+      "No features with non-zero variance remain after filtering. ",
+      "PCA cannot be computed on an empty or constant matrix. ",
+      "Check that filter thresholds are appropriate for the number of samples."
+    )
+  }
   # calculate PCA
   pca_fit <- stats::prcomp(tedf_var, scale = TRUE)
   pca_df <- pca_fit |>

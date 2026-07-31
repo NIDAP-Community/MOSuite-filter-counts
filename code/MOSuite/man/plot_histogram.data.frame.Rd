@@ -28,7 +28,7 @@ column with your preferred Labels here. The selected column should contain uniqu
 
 \item{color_values}{vector of colors as hex values or names recognized by R. Unnamed colors are assigned by factor
 level order when the grouping column is a factor; otherwise, they follow the order in which groups first appear in
-the metadata column.}
+the metadata column. Defaults to \code{NULL}; when \code{NULL}, \code{mosuite_palette} is used.}
 
 \item{color_by_group}{Set to FALSE to label histogram by Sample Names, or set to TRUE to label histogram by the
 column you select in the "Group Column Used to Color Histogram" parameter (below). Default is FALSE.}
@@ -53,6 +53,12 @@ automatically based on the number and length of legend labels.}
 \item{interactive_plots}{set to TRUE to make the plot interactive with \code{plotly}, allowing you to hover your mouse
 over a point or line to view sample information. The similarity heat map will not display if this toggle is set to
 TRUE. Default is FALSE.}
+
+\item{return_ggplot}{If \code{TRUE}, return the ggplot object prepared for interactive hover text before converting it to
+plotly. Used when callers need to add more ggplot layers first. Default is \code{FALSE}.}
+
+\item{use_log2_x_axis}{If \code{TRUE}, add a display-only pseudocount to plotted values and use a log2 x-axis. Default is
+\code{FALSE}.}
 
 \item{...}{additional arguments (ignored; accepted for compatibility with the moo dispatch)}
 }

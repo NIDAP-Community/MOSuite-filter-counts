@@ -16,21 +16,23 @@ plot_pca_2d(
   group_colname = "Group",
   label_colname = "Label",
   samples_to_rename = NULL,
-  color_values = c("#5954d6", "#e1562c", "#b80058", "#00c6f8", "#d163e6", "#00a76c",
-    "#ff9287", "#008cf9", "#006e00", "#796880", "#FFA500", "#878500"),
+  color_values = NULL,
   principal_components = c(1, 2),
   legend_position = "top",
-  point_size = 3,
-  add_label = TRUE,
+  point_size = 5,
   legend_font_size = NULL,
   label_font_size = 3,
   label_offset_x_ = 2,
   label_offset_y_ = 2,
+  log_transform = FALSE,
+  log_transform_pseudocount = 0.5,
+  log_transform_base = "ln",
   interactive_plots = FALSE,
   plots_subdir = "pca",
   plot_filename = "pca_2D.png",
   print_plots = options::opt("print_plots"),
-  save_plots = options::opt("save_plots")
+  save_plots = options::opt("save_plots"),
+  ...
 )
 
 ## S7 method for class <MOSuite::multiOmicDataSet>
@@ -44,21 +46,23 @@ plot_pca_2d(
   group_colname = "Group",
   label_colname = "Label",
   samples_to_rename = NULL,
-  color_values = c("#5954d6", "#e1562c", "#b80058", "#00c6f8", "#d163e6", "#00a76c",
-    "#ff9287", "#008cf9", "#006e00", "#796880", "#FFA500", "#878500"),
+  color_values = NULL,
   principal_components = c(1, 2),
   legend_position = "top",
-  point_size = 3,
-  add_label = TRUE,
+  point_size = 5,
   legend_font_size = NULL,
   label_font_size = 3,
   label_offset_x_ = 2,
   label_offset_y_ = 2,
+  log_transform = FALSE,
+  log_transform_pseudocount = 0.5,
+  log_transform_base = "ln",
   interactive_plots = FALSE,
   plots_subdir = "pca",
   plot_filename = "pca_2D.png",
   print_plots = options::opt("print_plots"),
-  save_plots = options::opt("save_plots")
+  save_plots = options::opt("save_plots"),
+  ...
 )
 
 ## S7 method for class <data.frame>
@@ -72,21 +76,23 @@ plot_pca_2d(
   group_colname = "Group",
   label_colname = "Label",
   samples_to_rename = NULL,
-  color_values = c("#5954d6", "#e1562c", "#b80058", "#00c6f8", "#d163e6", "#00a76c",
-    "#ff9287", "#008cf9", "#006e00", "#796880", "#FFA500", "#878500"),
+  color_values = NULL,
   principal_components = c(1, 2),
   legend_position = "top",
-  point_size = 3,
-  add_label = TRUE,
+  point_size = 5,
   legend_font_size = NULL,
   label_font_size = 3,
   label_offset_x_ = 2,
   label_offset_y_ = 2,
+  log_transform = FALSE,
+  log_transform_pseudocount = 0.5,
+  log_transform_base = "ln",
   interactive_plots = FALSE,
   plots_subdir = "pca",
   plot_filename = "pca_2D.png",
   print_plots = options::opt("print_plots"),
-  save_plots = options::opt("save_plots")
+  save_plots = options::opt("save_plots"),
+  ...
 )
 }
 \arguments{
@@ -112,11 +118,11 @@ used.)}
 column showing to which experimental treatments each sample belongs (e.g. WildType, Knockout, Tumor, Normal,
 Before, After, etc.).}
 
-\item{label_colname}{The column from the sample metadata containing the sample labels as you wish them to appear in
-the plots produced by this template. This can be the same Sample Names Column. However, you may desire different
-labels to display on your figure (e.g. shorter labels are sometimes preferred on plots). In that case, select the
-column with your preferred Labels here. The selected column should contain unique names for each sample. (Default:
-\code{NULL} -- \code{sample_id_colname} will be used.)}
+\item{label_colname}{The column from the sample metadata containing the sample labels as you wish them to appear on
+the PCA plot. If \code{NULL}, no labels are added to PCA points. This can be the same Sample Names Column. However, you
+may desire different labels to display on your figure (e.g. shorter labels are sometimes preferred on plots). In
+that case, select the column with your preferred Labels here. The selected column should contain unique names for
+each sample.}
 
 \item{samples_to_rename}{If you do not have a Plot Labels Column in your sample metadata table, you can use this
 parameter to rename samples manually for display on the PCA plot. Use "Add item" to add each additional sample for
@@ -125,15 +131,14 @@ which new name: old_name: new_name}
 
 \item{color_values}{vector of colors as hex values or names recognized by R. Unnamed colors are assigned by factor
 level order when the grouping column is a factor; otherwise, they follow the order in which groups first appear in
-the metadata column.}
+the metadata column. Defaults to \code{NULL}; when \code{NULL}, \code{mosuite_palette} is used for \code{data.frame} dispatch and
+stored colors are used for \code{multiOmicDataSet} dispatch.}
 
 \item{principal_components}{vector with numbered principal components to plot}
 
 \item{legend_position}{passed to in \code{legend.position} \code{ggplot2::theme()}}
 
 \item{point_size}{size for \code{ggplot2::geom_point()}}
-
-\item{add_label}{whether to add text labels for the points}
 
 \item{legend_font_size}{font size for the PCA legend text. If \code{NULL}, the size is scaled automatically based on the
 number and length of legend labels.}
@@ -144,6 +149,16 @@ number and length of legend labels.}
 
 \item{label_offset_y_}{vertical offset for text labels on the PCA plot.}
 
+\item{log_transform}{If \code{TRUE}, apply \code{log(x + log_transform_pseudocount, base = log_transform_base)} to sample
+count columns before PCA. Use this for count-like data such as raw, clean, filt, or CPM-like counts; leave it
+\code{FALSE} for already normalized/log-scale or batch-corrected values to avoid double transformation.}
+
+\item{log_transform_pseudocount}{Pseudocount added before log-transforming counts when \code{log_transform} is
+\code{TRUE}.}
+
+\item{log_transform_base}{Logarithm base to use when \code{log_transform} is \code{TRUE}. Use a numeric value, or \code{"e"},
+\code{"ln"}, or \code{"natural"} for natural log. Default is \code{"ln"} to match the original PCA transform.}
+
 \item{interactive_plots}{set to TRUE to make the PCA plot interactive with \code{plotly}.}
 
 \item{plots_subdir}{subdirectory in \verb{figures/} where PCA plots are saved.}
@@ -153,6 +168,8 @@ number and length of legend labels.}
 \item{print_plots}{Whether to print plots during analysis (Defaults to \code{FALSE}, overwritable using option 'moo_print_plots' or environment variable 'MOO_PRINT_PLOTS')}
 
 \item{save_plots}{Whether to save plots to files during analysis (Defaults to \code{TRUE}, overwritable using option 'moo_save_plots' or environment variable 'MOO_SAVE_PLOTS')}
+
+\item{...}{arguments forwarded to method}
 }
 \value{
 ggplot object
