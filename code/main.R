@@ -38,12 +38,6 @@ parser$add_argument(
   help = "Column name for sample IDs"
 )
 parser$add_argument(
-  "--samples_to_include",
-  type = "character",
-  default = "",
-  help = "Comma-separated list of samples to include"
-)
-parser$add_argument(
   "--group_colname",
   type = "character",
   default = "Group",
@@ -52,8 +46,8 @@ parser$add_argument(
 parser$add_argument(
   "--label_colname",
   type = "character",
-  default = "Label",
-  help = 'Column name from sample metadata table for sample labels used in heatmap and PCA figures. Use "Add labels to PCA" parameter in "Visualization: PCA" section to control if labels are added to PCA Plot.'
+  default = NULL,
+  help = "Column name for sample labels"
 )
 parser$add_argument(
   "--samples_to_rename",
@@ -90,6 +84,12 @@ parser$add_argument(
   type = "logical",
   default = FALSE,
   help = "Use group-based filtering"
+)
+parser$add_argument(
+  "--add_label_to_pca",
+  type = "logical",
+  default = TRUE,
+  help = "Label points on the PCA plot"
 )
 parser$add_argument(
   "--principal_component_on_x_axis",
@@ -132,12 +132,6 @@ parser$add_argument(
   type = "double",
   default = 3,
   help = "Point size for PCA plot"
-)
-parser$add_argument(
-  "--add_label_to_pca",
-  type = "logical",
-  default = TRUE,
-  help = 'Display labels from the sample metadata column selected in the "Label column name" parameter on PCA points.'
 )
 parser$add_argument(
   "--color_histogram_by_group",
@@ -211,7 +205,6 @@ moo |>
     count_type = args$count_type,
     feature_id_colname = args$feature_id_colname,
     sample_id_colname = args$sample_id_colname,
-    samples_to_include = parse_optional_vector(args$samples_to_include),
     group_colname = args$group_colname,
     label_colname = args$label_colname,
     samples_to_rename = parse_samples_to_rename(args$samples_to_rename),
@@ -220,6 +213,7 @@ moo |>
     minimum_number_of_samples_with_nonzero_counts_in_a_group = args$minimum_number_of_samples_with_nonzero_counts_in_a_group,
     use_cpm_counts_to_filter = args$use_cpm_counts_to_filter,
     use_group_based_filtering = args$use_group_based_filtering,
+    add_label_to_pca = args$add_label_to_pca,
     principal_component_on_x_axis = args$principal_component_on_x_axis,
     principal_component_on_y_axis = args$principal_component_on_y_axis,
     legend_position_for_pca = args$legend_position_for_pca,
@@ -227,7 +221,6 @@ moo |>
     label_offset_y_ = args$label_offset_y_,
     label_font_size = args$label_font_size,
     point_size_for_pca = args$point_size_for_pca,
-    add_label_to_pca = args$add_label_to_pca,
     color_histogram_by_group = args$color_histogram_by_group,
     set_min_max_for_x_axis_for_histogram = args$set_min_max_for_x_axis_for_histogram,
     minimum_for_x_axis_for_histogram = args$minimum_for_x_axis_for_histogram,
