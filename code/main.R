@@ -50,6 +50,12 @@ parser$add_argument(
   help = "Column name for sample labels"
 )
 parser$add_argument(
+  "--samples_to_include",
+  type = "character",
+  default = "",
+  help = "Comma-separated list of samples to include"
+)
+parser$add_argument(
   "--samples_to_rename",
   type = "character",
   default = "",
@@ -207,6 +213,7 @@ moo |>
     sample_id_colname = args$sample_id_colname,
     group_colname = args$group_colname,
     label_colname = args$label_colname,
+    samples_to_include = parse_optional_vector(args$samples_to_include),
     samples_to_rename = parse_samples_to_rename(args$samples_to_rename),
     minimum_count_value_to_be_considered_nonzero = args$minimum_count_value_to_be_considered_nonzero,
     minimum_number_of_samples_with_nonzero_counts_in_total = args$minimum_number_of_samples_with_nonzero_counts_in_total,

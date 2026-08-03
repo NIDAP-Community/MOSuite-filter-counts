@@ -74,21 +74,3 @@ expect_outputs_created <- function(results_dir) {
     info = "Output should be an S7 multiOmicDataSet object"
   )
 }
-
-default_cli_args <- c(
-  "--count_type=clean",
-  "--minimum_count_value_to_be_considered_nonzero=8",
-  "--minimum_number_of_samples_with_nonzero_counts_in_total=7",
-  "--minimum_number_of_samples_with_nonzero_counts_in_a_group=3",
-  "--use_cpm_counts_to_filter=TRUE",
-  "--use_group_based_filtering=FALSE",
-  "--plot_corr_matrix_heatmap=FALSE"
-)
-
-custom_cli_args <- c(
-  "--count_type=clean",
-  "--minimum_count_value_to_be_considered_nonzero=5",
-  "--minimum_number_of_samples_with_nonzero_counts_in_total=3",
-  "--use_cpm_counts_to_filter=FALSE",
-  "--plot_corr_matrix_heatmap=FALSE"
-)
