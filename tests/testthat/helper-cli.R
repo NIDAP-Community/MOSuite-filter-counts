@@ -70,7 +70,7 @@ expect_outputs_created <- function(results_dir) {
 
   moo <- readr::read_rds(moo_path)
   expect_true(
-    S7::S7_inherits(moo, MOSuite::multiOmicDataSet),
+    inherits(moo, "MOSuite::multiOmicDataSet"),
     info = "Output should be an S7 multiOmicDataSet object"
   )
 }
