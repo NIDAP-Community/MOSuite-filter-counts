@@ -2,7 +2,7 @@
 
 ## Development version
 
-- Sync Code Ocean app panel parameter descriptions with MOSuite package documentation (#7, @phoman14).
+- Sync Code Ocean app panel parameter descriptions with MOSuite package documentation for MOSuite v0.4.1 (#7, @phoman14).
 - Use MOSuite v0.3.2. (#4, @kelly-sovacool)
 - Align plot color defaults with MOSuite package defaults (#3, @phoman14).
 - Leave the histogram legend font size blank by default so MOSuite can scale long or numerous legend labels automatically (#3, @phoman14).
