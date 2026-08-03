@@ -1,4 +1,4 @@
-test_that("app panel exposes samples_to_include accepted by main.R", {
+test_that("every app panel parameter is accepted and used by main.R", {
   repo_root <- normalizePath(
     file.path(testthat::test_path(), "..", ".."),
     mustWork = TRUE
@@ -11,12 +11,23 @@ test_that("app panel exposes samples_to_include accepted by main.R", {
     collapse = "\n"
   )
 
-  expect_true("samples_to_include" %in% panel$parameters$param_name)
-  expect_match(main_text, '"--samples_to_include"')
-  expect_match(
-    main_text,
-    "samples_to_include = parse_optional_vector\\(args\\$samples_to_include\\)"
-  )
+  param_names <- panel$parameters$param_name
+  expect_true(length(param_names) > 0)
+
+  for (param_name in param_names) {
+    expect_match(
+      main_text,
+      sprintf('"--%s"', param_name),
+      fixed = TRUE,
+      info = sprintf("main.R should define a --%s CLI argument", param_name)
+    )
+    expect_match(
+      main_text,
+      sprintf("args$%s", param_name),
+      fixed = TRUE,
+      info = sprintf("main.R should read args$%s", param_name)
+    )
+  }
 })
 
 test_that("code/run executes successfully with default CLI arguments", {
