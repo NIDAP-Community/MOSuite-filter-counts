@@ -44,6 +44,9 @@ test_that("code/run executes successfully with default CLI arguments", {
   setwd(setup$code_dir)
   on.exit(setwd(old_wd), add = TRUE)
 
+  default_cli_args <- c(
+    "--plot_corr_matrix_heatmap=FALSE"
+  )
   exit_code <- system2("bash", args = c("run", default_cli_args))
   expect_equal(exit_code, 0, info = "run script should execute without error")
 
@@ -64,6 +67,12 @@ test_that("code/run executes with custom CLI arguments", {
   setwd(setup$code_dir)
   on.exit(setwd(old_wd), add = TRUE)
 
+  custom_cli_args <- c(
+    "--minimum_count_value_to_be_considered_nonzero=5",
+    "--minimum_number_of_samples_with_nonzero_counts_in_total=3",
+    "--use_cpm_counts_to_filter=FALSE",
+    "--plot_corr_matrix_heatmap=FALSE"
+  )
   exit_code <- system2("bash", args = c("run", custom_cli_args))
   expect_equal(
     exit_code,
@@ -94,6 +103,10 @@ test_that("code/run executes with group-based filtering CLI arguments", {
   setwd(setup$code_dir)
   on.exit(setwd(old_wd), add = TRUE)
 
+  group_based_cli_args <- c(
+    "--use_group_based_filtering=TRUE",
+    "--plot_corr_matrix_heatmap=FALSE"
+  )
   exit_code <- system2("bash", args = c("run", group_based_cli_args))
   expect_equal(
     exit_code,
