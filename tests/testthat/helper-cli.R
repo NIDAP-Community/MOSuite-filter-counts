@@ -58,6 +58,8 @@ setup_cli_workspace <- function(prefix = "mosuite_filter_counts_test_") {
 
 expect_outputs_created <- function(results_dir) {
   moo_path <- file.path(results_dir, "moo", "moo-filt.rds")
+  counts_path <- file.path(results_dir, "Filtered_Counts.csv")
+  metadata_path <- file.path(results_dir, "Sample_Metadata.csv")
 
   expect_true(
     file.exists(moo_path),
@@ -72,5 +74,39 @@ expect_outputs_created <- function(results_dir) {
   expect_true(
     inherits(moo, "MOSuite::multiOmicDataSet"),
     info = "Output should be an S7 multiOmicDataSet object"
+  )
+
+  expect_true(
+    file.exists(counts_path),
+    info = "DEG-compatible filtered counts should be created"
+  )
+  expect_true(
+    file.exists(metadata_path),
+    info = "DEG-compatible sample metadata should be created"
+  )
+
+  counts <- readr::read_csv(counts_path, show_col_types = FALSE)
+  metadata <- readr::read_csv(metadata_path, show_col_types = FALSE)
+  filtered_counts <- as.data.frame(moo@counts[["filt"]])
+
+  expect_identical(
+    colnames(counts)[1],
+    "GeneName",
+    info = "Filtered count feature IDs should be standardized for DEG"
+  )
+  expect_identical(
+    colnames(metadata)[1],
+    "Sample",
+    info = "Metadata sample IDs should be standardized for DEG"
+  )
+  expect_identical(
+    as.character(metadata$Sample),
+    colnames(filtered_counts)[-1],
+    info = "Metadata rows should be ordered to match filtered count samples"
+  )
+  expect_equal(
+    as.data.frame(counts)[-1],
+    filtered_counts[-1],
+    info = "DEG handoff should retain the original filtered count values"
   )
 }
