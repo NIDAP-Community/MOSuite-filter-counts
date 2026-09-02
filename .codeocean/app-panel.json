@@ -407,6 +407,15 @@
 	],
 	"results": [
 		{
+			"file_name": "Filtered_Counts.csv"
+		},
+		{
+			"file_name": "Sample_Metadata.csv"
+		},
+		{
+			"file_name": "moo/moo-filt.rds"
+		},
+		{
 			"file_name": "figures/filt/corr_heatmap.png"
 		},
 		{

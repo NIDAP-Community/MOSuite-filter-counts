@@ -16,7 +16,7 @@ parse_optional_number <- function(x) {
 
   value <- suppressWarnings(as.numeric(x))
   if (is.na(value)) {
-    stop(glue::glue("Expected a number, got '{x}'"))
+    stop(glue("Expected a number, got '{x}'"))
   }
   value
 }
@@ -205,8 +205,11 @@ args <- parser$parse_args()
 # load multiOmicDataSet from data directory
 moo <- load_moo_from_data_dir()
 
-# run MOSuite
-moo |>
+# Filter the counts.
+# The filtered counts (counts$filt) retains the original count values;
+# CPM is used only to decide which features to retain when
+# `use_cpm_counts_to_filter = TRUE`.
+moo_filtered <- moo |>
   filter_counts(
     count_type = args$count_type,
     feature_id_colname = args$feature_id_colname,
@@ -240,5 +243,94 @@ moo |>
     plot_corr_matrix_heatmap = args$plot_corr_matrix_heatmap,
     colors_for_plots = parse_optional_vector(args$colors_for_plots),
     interactive_plots = args$interactive_plots
-  ) |>
-  write_rds(file.path(getOption("moo_plots_dir"), "..", "moo", "moo-filt.rds"))
+  )
+
+# Write filtered counts & sample metadata counts for the OMIX DEG capsule.
+# The OMIX DEG analysis accepts a raw/integer-like count table with `GeneName`
+# as the first column plus a matching metadata table with `Sample` as the first
+# column.
+filtered_counts <- as.data.frame(moo_filtered@counts[["filt"]])
+feature_id_output_col <- args$feature_id_colname
+if (is.null(feature_id_output_col) || feature_id_output_col == "") {
+  feature_id_output_col <- colnames(filtered_counts)[1]
+}
+if (!(feature_id_output_col %in% colnames(filtered_counts))) {
+  stop(glue(
+    "Filtered counts are missing feature ID column '{feature_id_output_col}'."
+  ))
+}
+
+if (feature_id_output_col != "GeneName") {
+  if ("GeneName" %in% colnames(filtered_counts)) {
+    stop(
+      "Cannot standardize the filtered count table: it contains both the ",
+      "selected feature ID column and a separate GeneName column."
+    )
+  }
+  colnames(filtered_counts)[
+    colnames(filtered_counts) == feature_id_output_col
+  ] <-
+    "GeneName"
+}
+
+sample_ids <- colnames(filtered_counts)[-1]
+sample_metadata <- as.data.frame(moo_filtered@sample_meta)
+sample_id_output_col <- args$sample_id_colname
+if (is.null(sample_id_output_col) || sample_id_output_col == "") {
+  sample_id_output_col <- colnames(sample_metadata)[1]
+}
+if (!(sample_id_output_col %in% colnames(sample_metadata))) {
+  stop(glue(
+    "Sample metadata are missing sample ID column '{sample_id_output_col}'."
+  ))
+}
+
+metadata_index <- match(
+  sample_ids,
+  as.character(sample_metadata[[sample_id_output_col]])
+)
+if (anyNA(metadata_index)) {
+  stop(glue(
+    "Sample metadata are missing filtered count sample ID(s): {paste(sample_ids[is.na(metadata_index)], collapse = ', ')}"
+  ))
+}
+sample_metadata <- sample_metadata[metadata_index, , drop = FALSE]
+
+if (sample_id_output_col != "Sample") {
+  if ("Sample" %in% colnames(sample_metadata)) {
+    stop(
+      "Cannot standardize the metadata table: it contains both the selected ",
+      "sample ID column and a separate Sample column."
+    )
+  }
+  colnames(sample_metadata)[
+    colnames(sample_metadata) == sample_id_output_col
+  ] <-
+    "Sample"
+}
+
+# write results
+results_dir <- normalizePath(
+  file.path(getOption("moo_plots_dir"), ".."),
+  mustWork = FALSE
+)
+dir.create(
+  file.path(results_dir, "moo"),
+  recursive = TRUE,
+  showWarnings = FALSE
+)
+
+write_csv(filtered_counts, file.path(results_dir, "Filtered_Counts.csv"))
+message(glue(
+  "Wrote filtered counts: {file.path(results_dir, 'Filtered_Counts.csv')}"
+))
+write_csv(sample_metadata, file.path(results_dir, "Sample_Metadata.csv"))
+message(glue(
+  "Wrote sample metadata: {file.path(results_dir, 'Sample_Metadata.csv')}"
+))
+
+moo_filtered |>
+  write_rds(file.path(results_dir, "moo", "moo-filt.rds"))
+message(glue(
+  "Wrote filtered multiOmicDataSet: {file.path(results_dir, 'moo', 'moo-filt.rds')}"
+))
