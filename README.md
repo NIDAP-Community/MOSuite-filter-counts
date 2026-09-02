@@ -2,9 +2,9 @@
 
 Code Ocean capsule: MOSuite - filter low counts
 
-[![tests](https://github.com/CCBR/MOSuite-filter-counts/actions/workflows/tests.yml/badge.svg)](https://github.com/CCBR/MOSuite-filter-counts/actions/workflows/tests.yml)
+[![tests](https://github.com/NIDAP-Community/MOSuite-filter-counts/actions/workflows/tests.yml/badge.svg)](https://github.com/NIDAP-Community/MOSuite-filter-counts/actions/workflows/tests.yml)
 
-- [Code Ocean Capsule](https://poc-nci.codeocean.io/capsule/2922767/tree)
+- [Code Ocean Capsule](https://poc-nci.codeocean.io/capsule/2922767/tree) | [Latest Release](https://poc-nci.codeocean.io/capsule/4565215/tree/latest)
 - [MOSuite R package docs](https://ccbr.github.io/MOSuite/)
 
 ## Outputs
