@@ -32,7 +32,7 @@ test_that("every app panel parameter is accepted and used by main.R", {
 
 test_that("code/run executes successfully with default CLI arguments", {
   setup <- setup_cli_workspace("mosuite_filter_counts_test_")
-  on.exit(unlink(setup$workspace, recursive = TRUE), add = TRUE)
+  withr::defer(unlink(setup$workspace, recursive = TRUE))
 
   file.copy(
     file.path(setup$repo_root, "code", "run"),
@@ -40,9 +40,7 @@ test_that("code/run executes successfully with default CLI arguments", {
     overwrite = TRUE
   )
 
-  old_wd <- getwd()
-  setwd(setup$code_dir)
-  on.exit(setwd(old_wd), add = TRUE)
+  withr::local_dir(setup$code_dir)
 
   default_cli_args <- c(
     "--plot_corr_matrix_heatmap=FALSE"
@@ -55,7 +53,7 @@ test_that("code/run executes successfully with default CLI arguments", {
 
 test_that("code/run executes with custom CLI arguments", {
   setup <- setup_cli_workspace("mosuite_filter_counts_custom_test_")
-  on.exit(unlink(setup$workspace, recursive = TRUE), add = TRUE)
+  withr::defer(unlink(setup$workspace, recursive = TRUE))
 
   file.copy(
     file.path(setup$repo_root, "code", "run"),
@@ -63,9 +61,7 @@ test_that("code/run executes with custom CLI arguments", {
     overwrite = TRUE
   )
 
-  old_wd <- getwd()
-  setwd(setup$code_dir)
-  on.exit(setwd(old_wd), add = TRUE)
+  withr::local_dir(setup$code_dir)
 
   custom_cli_args <- c(
     "--minimum_count_value_to_be_considered_nonzero=5",
@@ -85,7 +81,7 @@ test_that("code/run executes with custom CLI arguments", {
 
 test_that("code/run executes with group-based filtering CLI arguments", {
   setup <- setup_cli_workspace("mosuite_filter_counts_group_test_")
-  on.exit(unlink(setup$workspace, recursive = TRUE), add = TRUE)
+  withr::defer(unlink(setup$workspace, recursive = TRUE))
 
   moo_path <- file.path(setup$workspace, "data", "moo.rds")
   moo <- readr::read_rds(moo_path)
@@ -99,9 +95,7 @@ test_that("code/run executes with group-based filtering CLI arguments", {
     overwrite = TRUE
   )
 
-  old_wd <- getwd()
-  setwd(setup$code_dir)
-  on.exit(setwd(old_wd), add = TRUE)
+  withr::local_dir(setup$code_dir)
 
   group_based_cli_args <- c(
     "--use_group_based_filtering=TRUE",
@@ -115,4 +109,97 @@ test_that("code/run executes with group-based filtering CLI arguments", {
   )
 
   expect_outputs_created(setup$results_dir)
+})
+
+test_that("main.R creates output directories when run directly", {
+  setup <- setup_cli_workspace("mosuite_filter_counts_direct_main_test_")
+  withr::defer(unlink(setup$workspace, recursive = TRUE))
+
+  unlink(file.path(setup$results_dir, "moo"), recursive = TRUE)
+
+  result <- run_command_capture(
+    "Rscript",
+    args = c("main.R", "--plot_corr_matrix_heatmap=FALSE"),
+    wd = setup$code_dir
+  )
+
+  expect_equal(
+    result$status,
+    0,
+    info = "main.R should run successfully without pre-created results directories"
+  )
+  expect_outputs_created(setup$results_dir)
+})
+
+test_that("custom ID columns are standardized in DEG handoff outputs", {
+  setup <- setup_cli_workspace("mosuite_filter_counts_custom_id_cols_test_")
+  withr::defer(unlink(setup$workspace, recursive = TRUE))
+
+  moo_path <- file.path(setup$workspace, "data", "moo.rds")
+  moo <- readr::read_rds(moo_path)
+
+  clean_counts <- as.data.frame(moo@counts[["clean"]])
+  colnames(clean_counts)[1] <- "FeatureID"
+  moo@counts[["clean"]] <- clean_counts
+
+  sample_metadata <- as.data.frame(moo@sample_meta)
+  colnames(sample_metadata)[1] <- "SampleID"
+  moo@sample_meta <- sample_metadata
+
+  readr::write_rds(moo, moo_path)
+
+  file.copy(
+    file.path(setup$repo_root, "code", "run"),
+    file.path(setup$code_dir, "run"),
+    overwrite = TRUE
+  )
+
+  result <- run_command_capture(
+    "bash",
+    args = c(
+      "run",
+      "--feature_id_colname=FeatureID",
+      "--sample_id_colname=SampleID",
+      "--plot_corr_matrix_heatmap=FALSE"
+    ),
+    wd = setup$code_dir
+  )
+
+  expect_equal(
+    result$status,
+    0,
+    info = "run script should support non-default feature and sample ID columns"
+  )
+  expect_outputs_created(setup$results_dir)
+})
+
+test_that("main.R reports missing sample metadata IDs clearly", {
+  setup <- setup_cli_workspace("mosuite_filter_counts_missing_sample_col_test_")
+  withr::defer(unlink(setup$workspace, recursive = TRUE))
+
+  moo_path <- file.path(setup$workspace, "data", "moo.rds")
+  moo <- readr::read_rds(moo_path)
+
+  sample_metadata <- as.data.frame(moo@sample_meta)
+  colnames(sample_metadata)[1] <- "SampleID"
+  moo@sample_meta <- sample_metadata
+
+  readr::write_rds(moo, moo_path)
+
+  result <- suppressWarnings(
+    run_command_capture(
+      "Rscript",
+      args = c(
+        "main.R",
+        "--sample_id_colname=Sample",
+        "--plot_corr_matrix_heatmap=FALSE"
+      ),
+      wd = setup$code_dir
+    )
+  )
+
+  expect_true(
+    result$status != 0,
+    info = "main.R should fail when the configured sample ID column is absent"
+  )
 })

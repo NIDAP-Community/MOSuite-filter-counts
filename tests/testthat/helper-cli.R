@@ -56,6 +56,27 @@ setup_cli_workspace <- function(prefix = "mosuite_filter_counts_test_") {
   )
 }
 
+run_command_capture <- function(command, args = character(), wd = NULL) {
+  output <- if (is.null(wd)) {
+    system2(command, args = args, stdout = TRUE, stderr = TRUE)
+  } else {
+    withr::with_dir(
+      wd,
+      system2(command, args = args, stdout = TRUE, stderr = TRUE)
+    )
+  }
+
+  status <- attr(output, "status")
+  if (is.null(status)) {
+    status <- 0L
+  }
+
+  list(
+    status = as.integer(status),
+    output = output
+  )
+}
+
 expect_outputs_created <- function(results_dir) {
   moo_path <- file.path(results_dir, "moo", "moo-filt.rds")
   counts_path <- file.path(results_dir, "Filtered_Counts.csv")
