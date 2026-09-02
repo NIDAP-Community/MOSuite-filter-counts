@@ -8,7 +8,7 @@ message: 'To cite package "MOSuite" in publications use:'
 type: software
 license: MIT
 title: 'MOSuite: R package for differential multi-omics analysis'
-version: 0.4.1
+version: 0.4.2
 doi: 10.5281/zenodo.16371580
 identifiers:
 - description: Archived snapshots of all versions
@@ -574,7 +574,7 @@ references:
   doi: 10.32614/CRAN.package.broom
 - type: software
   title: cffr
-  abstract: 'cffr: Generate Citation File Format (''CFF'') Metadata for R Packages'
+  abstract: 'cffr: Generate Citation File Format (''CFF'') Metadata'
   notes: Suggests
   url: https://docs.ropensci.org/cffr/
   repository: https://CRAN.R-project.org/package=cffr
