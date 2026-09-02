@@ -1,6 +1,6 @@
 # Code Ocean capsule - MOSuite - filter low counts
 
-## Development version
+## v4.0
 
 - Output filter counts and sample metadata as CSV files for downstream use by OMIX DEG capsules. (#11, @maggiecam)
 - Sync Code Ocean app panel parameter descriptions with MOSuite package documentation for MOSuite v0.4.1 (#7, @phoman14).
